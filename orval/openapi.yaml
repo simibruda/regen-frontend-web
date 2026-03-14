@@ -1,0 +1,42 @@
+openapi: 3.0.3
+info:
+  title: Demo Posts API
+  version: 1.0.0
+servers:
+  - url: https://jsonplaceholder.typicode.com
+paths:
+  /posts:
+    get:
+      tags:
+        - posts
+      operationId: getPosts
+      summary: List posts
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Post'
+components:
+  schemas:
+    Post:
+      type: object
+      required:
+        - userId
+        - id
+        - title
+        - body
+      properties:
+        userId:
+          type: integer
+          format: int32
+        id:
+          type: integer
+          format: int32
+        title:
+          type: string
+        body:
+          type: string
