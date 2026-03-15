@@ -1,4 +1,5 @@
-import { Outlet, createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
+import { Layout } from '@/common/components/layout/Layout'
 
 export const Route = createFileRoute('/_auth-guard')({
   beforeLoad: async () => {
@@ -10,6 +11,6 @@ export const Route = createFileRoute('/_auth-guard')({
     // }
     // return { user }
   },
-  component: Outlet,
+  component: Layout,
 })
 

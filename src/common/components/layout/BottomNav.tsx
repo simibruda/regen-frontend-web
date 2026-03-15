@@ -1,0 +1,44 @@
+import { Link, useRouterState } from '@tanstack/react-router'
+import { Home, FolderOpen, Users, Settings } from 'lucide-react'
+import { cn } from '@/lib/utils'
+
+const navItems = [
+  { title: 'Home', to: '/', icon: Home },
+  { title: 'Projects', to: '/projects', icon: FolderOpen },
+  { title: 'Users', to: '/users', icon: Users },
+  { title: 'Settings', to: '/settings', icon: Settings },
+]
+
+export function BottomNav() {
+  const router = useRouterState()
+  const currentPath = router.location.pathname
+
+  return (
+    <nav className="fixed inset-x-4 bottom-4 z-50 rounded-full bg-primary shadow-lg md:hidden">
+      <ul className="flex items-center justify-around py-2">
+        {navItems.map((item) => {
+          const isActive = currentPath === item.to
+          return (
+            <li key={item.title}>
+              <Link
+                to={item.to}
+                className="flex flex-col items-center gap-0.5"
+              >
+                <div
+                  className={cn(
+                    'flex size-10 items-center justify-center rounded-full transition-colors',
+                    isActive
+                      ? 'bg-accent/20 text-accent'
+                      : 'text-white/60',
+                  )}
+                >
+                  <item.icon className="size-5" />
+                </div>
+              </Link>
+            </li>
+          )
+        })}
+      </ul>
+    </nav>
+  )
+}
