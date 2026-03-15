@@ -1,4 +1,5 @@
 import type { Category } from '@/common/mocks/categories'
+import { Link } from '@tanstack/react-router'
 import { Layers, LayoutGrid } from 'lucide-react'
 
 type IconComponent = React.ComponentType<{ className?: string }>
@@ -73,8 +74,9 @@ export function CategoryCard({ category }: { category: Category }) {
   const overflow = category.assignedPeople.length - visiblePeople.length
 
   return (
-    <a
-      href={`/categories/${category.id}`}
+    <Link
+      to="/category/$id"
+      params={{ id: category.id }}
       className="group flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-lg"
     >
       <div className={`h-1.5 w-full ${accentBar}`} />
@@ -114,6 +116,6 @@ export function CategoryCard({ category }: { category: Category }) {
           </span>
         </div>
       </div>
-    </a>
+    </Link>
   )
 }

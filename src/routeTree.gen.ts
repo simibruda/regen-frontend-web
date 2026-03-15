@@ -14,6 +14,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthGuardRouteImport } from './routes/_auth-guard'
 import { Route as AuthGuardIndexRouteImport } from './routes/_auth-guard/index'
 import { Route as AuthGuardManagerGuardRouteImport } from './routes/_auth-guard/_manager-guard'
+import { Route as AuthGuardCategoryIdRouteImport } from './routes/_auth-guard/category.$id'
 import { Route as AuthGuardManagerGuardUsersRouteImport } from './routes/_auth-guard/_manager-guard/users'
 
 const RegisterRoute = RegisterRouteImport.update({
@@ -39,6 +40,11 @@ const AuthGuardManagerGuardRoute = AuthGuardManagerGuardRouteImport.update({
   id: '/_manager-guard',
   getParentRoute: () => AuthGuardRoute,
 } as any)
+const AuthGuardCategoryIdRoute = AuthGuardCategoryIdRouteImport.update({
+  id: '/category/$id',
+  path: '/category/$id',
+  getParentRoute: () => AuthGuardRoute,
+} as any)
 const AuthGuardManagerGuardUsersRoute =
   AuthGuardManagerGuardUsersRouteImport.update({
     id: '/users',
@@ -51,12 +57,14 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/users': typeof AuthGuardManagerGuardUsersRoute
+  '/category/$id': typeof AuthGuardCategoryIdRoute
 }
 export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
   '/': typeof AuthGuardIndexRoute
   '/users': typeof AuthGuardManagerGuardUsersRoute
+  '/category/$id': typeof AuthGuardCategoryIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -66,12 +74,13 @@ export interface FileRoutesById {
   '/_auth-guard/_manager-guard': typeof AuthGuardManagerGuardRouteWithChildren
   '/_auth-guard/': typeof AuthGuardIndexRoute
   '/_auth-guard/_manager-guard/users': typeof AuthGuardManagerGuardUsersRoute
+  '/_auth-guard/category/$id': typeof AuthGuardCategoryIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/register' | '/users'
+  fullPaths: '/' | '/login' | '/register' | '/users' | '/category/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/login' | '/register' | '/' | '/users'
+  to: '/login' | '/register' | '/' | '/users' | '/category/$id'
   id:
     | '__root__'
     | '/_auth-guard'
@@ -80,6 +89,7 @@ export interface FileRouteTypes {
     | '/_auth-guard/_manager-guard'
     | '/_auth-guard/'
     | '/_auth-guard/_manager-guard/users'
+    | '/_auth-guard/category/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -125,6 +135,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthGuardManagerGuardRouteImport
       parentRoute: typeof AuthGuardRoute
     }
+    '/_auth-guard/category/$id': {
+      id: '/_auth-guard/category/$id'
+      path: '/category/$id'
+      fullPath: '/category/$id'
+      preLoaderRoute: typeof AuthGuardCategoryIdRouteImport
+      parentRoute: typeof AuthGuardRoute
+    }
     '/_auth-guard/_manager-guard/users': {
       id: '/_auth-guard/_manager-guard/users'
       path: '/users'
@@ -151,11 +168,13 @@ const AuthGuardManagerGuardRouteWithChildren =
 interface AuthGuardRouteChildren {
   AuthGuardManagerGuardRoute: typeof AuthGuardManagerGuardRouteWithChildren
   AuthGuardIndexRoute: typeof AuthGuardIndexRoute
+  AuthGuardCategoryIdRoute: typeof AuthGuardCategoryIdRoute
 }
 
 const AuthGuardRouteChildren: AuthGuardRouteChildren = {
   AuthGuardManagerGuardRoute: AuthGuardManagerGuardRouteWithChildren,
   AuthGuardIndexRoute: AuthGuardIndexRoute,
+  AuthGuardCategoryIdRoute: AuthGuardCategoryIdRoute,
 }
 
 const AuthGuardRouteWithChildren = AuthGuardRoute._addFileChildren(
