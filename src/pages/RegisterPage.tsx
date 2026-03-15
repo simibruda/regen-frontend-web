@@ -115,6 +115,18 @@ export function RegisterPage() {
               {isSubmitting ? 'Registering...' : 'Register'}
             </Button>
           </form>
+
+          <p className="mt-4 text-center text-xs text-black/40">
+            Powered by{' '}
+            <a
+              href="https://fundatiaregen.ro/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-primary hover:underline"
+            >
+              Fundația REGEN
+            </a>
+          </p>
         </div>
       </section>
     </main>
