@@ -1,0 +1,17 @@
+import { Outlet, createFileRoute } from '@tanstack/react-router'
+
+export const Route = createFileRoute('/_auth-guard/_manager-guard')({
+  beforeLoad: async () => {
+   // TODO: add a validation get the current user and if is not a manager then it should redirect to /
+
+    // const user = await getUser()
+    // if (!user) {
+    //   return redirect({ to: '/' })
+    // }
+    // if (user.role !== 'manager') {
+    //   return redirect({ to: '/' })
+    // }
+  },
+  component: Outlet,
+})
+

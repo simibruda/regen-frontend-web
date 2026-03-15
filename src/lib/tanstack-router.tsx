@@ -10,14 +10,8 @@ export const router = createRouter({
   defaultPreload: 'intent',
   defaultPreloadStaleTime: 0,
   defaultPendingMs: 0,
-  defaultPendingComponent: <>,
-  defaultErrorComponent: ({ error }: { error: Error }) =>
-  FallbackErrorPage({
-    error,
-    resetError: () => {
-      window.location.reload()
-    },
-  }),
+  defaultPendingComponent: () => <div>Loading...</div>,
+  defaultErrorComponent:() => <div>Error</div>,
 });
 
 // Register the router instance for type safety
