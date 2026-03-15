@@ -12,7 +12,9 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthGuardRouteImport } from './routes/_auth-guard'
+import { Route as AuthGuardIndexRouteImport } from './routes/_auth-guard/index'
 import { Route as AuthGuardManagerGuardRouteImport } from './routes/_auth-guard/_manager-guard'
+import { Route as AuthGuardManagerGuardUsersRouteImport } from './routes/_auth-guard/_manager-guard/users'
 
 const RegisterRoute = RegisterRouteImport.update({
   id: '/register',
@@ -28,39 +30,56 @@ const AuthGuardRoute = AuthGuardRouteImport.update({
   id: '/_auth-guard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthGuardIndexRoute = AuthGuardIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthGuardRoute,
+} as any)
 const AuthGuardManagerGuardRoute = AuthGuardManagerGuardRouteImport.update({
   id: '/_manager-guard',
   getParentRoute: () => AuthGuardRoute,
 } as any)
+const AuthGuardManagerGuardUsersRoute =
+  AuthGuardManagerGuardUsersRouteImport.update({
+    id: '/users',
+    path: '/users',
+    getParentRoute: () => AuthGuardManagerGuardRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof AuthGuardManagerGuardRoute
+  '/': typeof AuthGuardIndexRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/users': typeof AuthGuardManagerGuardUsersRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof AuthGuardManagerGuardRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/': typeof AuthGuardIndexRoute
+  '/users': typeof AuthGuardManagerGuardUsersRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_auth-guard': typeof AuthGuardRouteWithChildren
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
-  '/_auth-guard/_manager-guard': typeof AuthGuardManagerGuardRoute
+  '/_auth-guard/_manager-guard': typeof AuthGuardManagerGuardRouteWithChildren
+  '/_auth-guard/': typeof AuthGuardIndexRoute
+  '/_auth-guard/_manager-guard/users': typeof AuthGuardManagerGuardUsersRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/register'
+  fullPaths: '/' | '/login' | '/register' | '/users'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/register'
+  to: '/login' | '/register' | '/' | '/users'
   id:
     | '__root__'
     | '/_auth-guard'
     | '/login'
     | '/register'
     | '/_auth-guard/_manager-guard'
+    | '/_auth-guard/'
+    | '/_auth-guard/_manager-guard/users'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -92,6 +111,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthGuardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_auth-guard/': {
+      id: '/_auth-guard/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof AuthGuardIndexRouteImport
+      parentRoute: typeof AuthGuardRoute
+    }
     '/_auth-guard/_manager-guard': {
       id: '/_auth-guard/_manager-guard'
       path: ''
@@ -99,15 +125,37 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthGuardManagerGuardRouteImport
       parentRoute: typeof AuthGuardRoute
     }
+    '/_auth-guard/_manager-guard/users': {
+      id: '/_auth-guard/_manager-guard/users'
+      path: '/users'
+      fullPath: '/users'
+      preLoaderRoute: typeof AuthGuardManagerGuardUsersRouteImport
+      parentRoute: typeof AuthGuardManagerGuardRoute
+    }
   }
 }
 
+interface AuthGuardManagerGuardRouteChildren {
+  AuthGuardManagerGuardUsersRoute: typeof AuthGuardManagerGuardUsersRoute
+}
+
+const AuthGuardManagerGuardRouteChildren: AuthGuardManagerGuardRouteChildren = {
+  AuthGuardManagerGuardUsersRoute: AuthGuardManagerGuardUsersRoute,
+}
+
+const AuthGuardManagerGuardRouteWithChildren =
+  AuthGuardManagerGuardRoute._addFileChildren(
+    AuthGuardManagerGuardRouteChildren,
+  )
+
 interface AuthGuardRouteChildren {
-  AuthGuardManagerGuardRoute: typeof AuthGuardManagerGuardRoute
+  AuthGuardManagerGuardRoute: typeof AuthGuardManagerGuardRouteWithChildren
+  AuthGuardIndexRoute: typeof AuthGuardIndexRoute
 }
 
 const AuthGuardRouteChildren: AuthGuardRouteChildren = {
-  AuthGuardManagerGuardRoute: AuthGuardManagerGuardRoute,
+  AuthGuardManagerGuardRoute: AuthGuardManagerGuardRouteWithChildren,
+  AuthGuardIndexRoute: AuthGuardIndexRoute,
 }
 
 const AuthGuardRouteWithChildren = AuthGuardRoute._addFileChildren(
