@@ -59,7 +59,7 @@ export function ReceiptsTableSection({ receipts, categoryName }: ReceiptsTableSe
           <Button
             size="sm"
             variant="outline"
-            className="border-primary text-primary hover:bg-primary hover:text-white"
+            className="border-border text-foreground hover:bg-secondary"
             onClick={() => handleDownloadReceipt(row.original.id)}
           >
             <Download className="h-4 w-4" />
