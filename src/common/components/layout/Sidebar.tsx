@@ -1,5 +1,5 @@
 import { Link, useRouterState } from '@tanstack/react-router'
-import { Home, Users, FolderOpen, Settings, LogOut } from 'lucide-react'
+import { LogOut } from 'lucide-react'
 import {
   Sidebar,
   SidebarContent,
@@ -12,13 +12,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/common/components/_base/sidebar'
-
-const navItems = [
-  { title: 'Home', to: '/', icon: Home },
-  { title: 'Projects', to: '/projects', icon: FolderOpen },
-  { title: 'Users', to: '/users', icon: Users },
-  { title: 'Settings', to: '/settings', icon: Settings },
-]
+import { managerNavigation } from '@/common/config/navigation'
 
 export function AppSidebar() {
   const router = useRouterState()
@@ -41,7 +35,7 @@ export function AppSidebar() {
           <SidebarGroupLabel>Navigation</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {navItems.map((item) => (
+              {managerNavigation.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
                     isActive={currentPath === item.to}

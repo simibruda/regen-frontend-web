@@ -1,13 +1,6 @@
 import { Link, useRouterState } from '@tanstack/react-router'
-import { Home, FolderOpen, Users, Settings } from 'lucide-react'
 import { cn } from '@/lib/utils'
-
-const navItems = [
-  { title: 'Home', to: '/', icon: Home },
-  { title: 'Projects', to: '/projects', icon: FolderOpen },
-  { title: 'Users', to: '/users', icon: Users },
-  { title: 'Settings', to: '/settings', icon: Settings },
-]
+import { managerNavigation } from '@/common/config/navigation'
 
 export function BottomNav() {
   const router = useRouterState()
@@ -16,7 +9,7 @@ export function BottomNav() {
   return (
     <nav className="fixed inset-x-4 bottom-4 z-50 rounded-full bg-primary shadow-lg md:hidden">
       <ul className="flex items-center justify-around py-2">
-        {navItems.map((item) => {
+        {managerNavigation.map((item) => {
           const isActive = currentPath === item.to
           return (
             <li key={item.title}>
