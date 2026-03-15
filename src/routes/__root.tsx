@@ -1,5 +1,6 @@
-import { Link, Outlet, createRootRouteWithContext } from '@tanstack/react-router'
 import type { QueryClient } from '@tanstack/react-query'
+import { Link, Outlet, createRootRouteWithContext } from '@tanstack/react-router'
+import { buttonClassName } from '../common/components/ui/button'
 
 type RouterContext = {
   queryClient: QueryClient
@@ -17,13 +18,13 @@ function RootLayout() {
         <nav className="flex gap-3">
           <Link
             to="/"
-            className="rounded-md border border-slate-700 px-3 py-1.5 text-sm hover:bg-slate-800"
+            className={buttonClassName({ variant: 'outlet', size: 'sm' })}
           >
             Home
           </Link>
           <Link
             to="/posts"
-            className="rounded-md border border-slate-700 px-3 py-1.5 text-sm hover:bg-slate-800"
+            className={buttonClassName({ variant: 'outlet', size: 'sm' })}
           >
             Posts
           </Link>
