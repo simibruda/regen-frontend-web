@@ -7,9 +7,10 @@ import { CarsTableSection } from '@/features/workspace/components/category/cars-
 import { ReceiptsTableSection } from '@/features/workspace/components/category/receipts-table-section'
 import { RoutesTableSection } from '@/features/workspace/components/category/routes-table-section'
 import { StatsSection } from '@/features/workspace/components/category/stats-section'
+import { cn } from '@/lib/utils'
 import { Link, useParams } from '@tanstack/react-router'
 import dayjs from 'dayjs'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Car, MapPin, Receipt } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
 export function CategoryPage() {
@@ -17,6 +18,7 @@ export function CategoryPage() {
   const category = categories.find((item) => item.id === id)
   const [startDate, setStartDate] = useState(dayjs().startOf('month').format('YYYY-MM-DD'))
   const [endDate, setEndDate] = useState(dayjs().format('YYYY-MM-DD'))
+  const [activeTab, setActiveTab] = useState<'receipts' | 'routes' | 'cars'>('receipts')
 
   const hasValidRange = dayjs(startDate).isValid() && dayjs(endDate).isValid() && startDate <= endDate
 
@@ -106,9 +108,27 @@ export function CategoryPage() {
     }, 0)
   }, [filteredRoutes])
 
+  const fleetRows = useMemo(
+    () =>
+      cars.map((car) => {
+        const totalKmByCar = filteredRoutes
+          .filter((route) => route.carId === car.id)
+          .reduce((sum, route) => sum + (route.endKm - route.startKm), 0)
+
+        return {
+          id: car.id,
+          name: car.name,
+          plateNumber: car.plateNumber,
+          totalKm: totalKmByCar,
+          fuelLiters: (totalKmByCar * car.averageConsumptionPer100Km) / 100,
+        }
+      }),
+    [filteredRoutes],
+  )
+
   if (!category) {
     return (
-      <main className="min-h-full bg-background p-4 pb-36 md:p-5 md:pb-5">
+      <main className="min-h-full bg-background p-4 pt-20 pb-36 md:p-5 md:pt-8 md:pb-5">
         <div className="mx-auto max-w-5xl">
           <div className="rounded-2xl border border-border bg-card p-5">
             <p className="text-lg font-semibold text-foreground">Category not found</p>
@@ -128,10 +148,22 @@ export function CategoryPage() {
   }
 
   return (
-    <main className="min-h-full bg-background p-4 pb-36 md:p-5 md:pb-5">
+    <main className="min-h-full bg-background p-4 pt-20 pb-36 md:p-5 md:pt-8 md:pb-5">
       <div className="mx-auto max-w-5xl space-y-8">
+        <div className="flex items-center justify-between gap-3 border-b border-border/60 pb-4">
+          <div>
+            <h1 className="text-[2rem] leading-tight font-bold text-foreground">{category.name}</h1>
+            <p className="mt-1 text-base text-muted-foreground">Category analytics and records by date</p>
+          </div>
+          <Link to="/">
+            <Button variant="outline" className="border-border text-foreground hover:bg-secondary">
+              <ArrowLeft className="h-4 w-4 text-primary" />
+              Back
+            </Button>
+          </Link>
+        </div>
+
         <StatsSection
-          categoryName={category.name}
           startDate={startDate}
           endDate={endDate}
           onStartDateChange={setStartDate}
@@ -142,11 +174,58 @@ export function CategoryPage() {
           totalKm={totalKm}
           totalFuel={totalFuel}
           pieChartData={pieChartData}
+          fleetRows={fleetRows}
         />
 
-        <ReceiptsTableSection receipts={filteredReceipts} categoryName={category.name} />
-        <RoutesTableSection routes={filteredRoutes} />
-        <CarsTableSection routes={filteredRoutes} />
+        <section className="space-y-4">
+          <div className="inline-flex rounded-xl border border-border bg-card p-1">
+            <button
+              type="button"
+              onClick={() => setActiveTab('receipts')}
+              className={cn(
+                'inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors',
+                activeTab === 'receipts'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'text-muted-foreground hover:bg-secondary hover:text-foreground',
+              )}
+            >
+              <Receipt className="h-4 w-4" />
+              Receipts
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('routes')}
+              className={cn(
+                'inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors',
+                activeTab === 'routes'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'text-muted-foreground hover:bg-secondary hover:text-foreground',
+              )}
+            >
+              <MapPin className="h-4 w-4" />
+              Routes
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('cars')}
+              className={cn(
+                'inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors',
+                activeTab === 'cars'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'text-muted-foreground hover:bg-secondary hover:text-foreground',
+              )}
+            >
+              <Car className="h-4 w-4" />
+              Cars
+            </button>
+          </div>
+
+          {activeTab === 'receipts' && (
+            <ReceiptsTableSection receipts={filteredReceipts} categoryName={category.name} />
+          )}
+          {activeTab === 'routes' && <RoutesTableSection routes={filteredRoutes} />}
+          {activeTab === 'cars' && <CarsTableSection routes={filteredRoutes} />}
+        </section>
       </div>
     </main>
   )

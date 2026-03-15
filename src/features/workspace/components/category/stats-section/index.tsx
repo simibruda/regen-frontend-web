@@ -1,9 +1,5 @@
-import { Button } from '@/common/components/_base/button'
-import { InputField } from '@/common/components/_base/input-field'
-import { Separator } from '@/common/components/_base/separator'
 import { cn } from '@/lib/utils'
-import { Link } from '@tanstack/react-router'
-import { ArrowLeft, BarChart3, Fuel, Gauge, MapPin, Receipt } from 'lucide-react'
+import { BarChart3, CalendarDays, Car, Fuel, Gauge, MapPin, Receipt } from 'lucide-react'
 
 type PieSlice = {
   name: string
@@ -19,7 +15,6 @@ type PieChartData = {
 }
 
 type StatsSectionProps = {
-  categoryName: string
   startDate: string
   endDate: string
   onStartDateChange: (value: string) => void
@@ -30,10 +25,16 @@ type StatsSectionProps = {
   totalKm: number
   totalFuel: number
   pieChartData: PieChartData
+  fleetRows: {
+    id: string
+    name: string
+    plateNumber: string
+    totalKm: number
+    fuelLiters: number
+  }[]
 }
 
 export function StatsSection({
-  categoryName,
   startDate,
   endDate,
   onStartDateChange,
@@ -44,44 +45,40 @@ export function StatsSection({
   totalKm,
   totalFuel,
   pieChartData,
+  fleetRows,
 }: StatsSectionProps) {
   return (
-    <section className="rounded-2xl border border-border bg-linear-to-br from-card to-secondary/15 p-5 shadow-sm md:p-6">
-      <div className="mb-4 flex items-center justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">{categoryName}</h1>
-          <p className="text-sm text-muted-foreground">Category analytics and records by date</p>
+    <section className="space-y-6">
+      <div className="flex flex-col gap-2 md:flex-row md:items-center md:gap-4">
+        <p className="text-xs font-semibold tracking-wide text-muted-foreground">FILTER PERIOD</p>
+        <div className="flex w-full max-w-lg items-center rounded-xl border border-border bg-background px-3 py-2 shadow-sm">
+          <label htmlFor="start-date" className="flex min-w-0 flex-1 items-center gap-2">
+            <CalendarDays className="h-4 w-4 shrink-0 text-muted-foreground" />
+            <input
+              id="start-date"
+              type="date"
+              value={startDate}
+              onChange={(event) => onStartDateChange(event.target.value)}
+              className="w-full bg-transparent text-sm font-medium text-foreground outline-none"
+            />
+          </label>
+          <span className="px-2 text-muted-foreground">-</span>
+          <label htmlFor="end-date" className="flex min-w-0 flex-1 items-center gap-2">
+            <CalendarDays className="h-4 w-4 shrink-0 text-muted-foreground" />
+            <input
+              id="end-date"
+              type="date"
+              value={endDate}
+              onChange={(event) => onEndDateChange(event.target.value)}
+              className="w-full bg-transparent text-sm font-medium text-foreground outline-none"
+            />
+          </label>
         </div>
-        <Link to="/">
-          <Button variant="outline" className="border-border text-foreground hover:bg-secondary">
-            <ArrowLeft className="h-4 w-4 text-primary" />
-            Back
-          </Button>
-        </Link>
-      </div>
-
-      <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-        <InputField
-          id="start-date"
-          type="date"
-          label="Start date"
-          value={startDate}
-          onChange={(event) => onStartDateChange(event.target.value)}
-        />
-        <InputField
-          id="end-date"
-          type="date"
-          label="End date"
-          value={endDate}
-          onChange={(event) => onEndDateChange(event.target.value)}
-        />
       </div>
 
       {!hasValidRange && (
         <p className="mt-1 text-sm text-destructive">Start date must be before or equal to end date.</p>
       )}
-
-
 
       <div className="grid grid-cols-2 gap-2.5 md:grid-cols-4">
         <StatCard
@@ -114,57 +111,88 @@ export function StatsSection({
         />
       </div>
 
-      <div className="flex items-center gap-2">
-        <BarChart3 className="h-5 w-5 text-primary" />
-        <h2 className="text-lg font-semibold text-foreground">Receipts grouped by name</h2>
-      </div>
-      <p className="mt-0.5 pl-7 text-sm text-muted-foreground">Amounts for selected start/end dates.</p>
-      <div className="mt-5 grid grid-cols-1 gap-6 md:grid-cols-[240px_1fr] md:items-center">
-        {pieChartData.slices.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No receipt data in selected range.</p>
-        ) : (
-          <>
-            <div className="mx-auto">
-              <div
-                className="relative h-52 w-52 rounded-full"
-                style={{ backgroundImage: pieChartData.conicGradient }}
-                aria-label="Receipts distribution pie chart"
-              >
-                <div className="absolute inset-8 grid place-items-center rounded-full bg-card text-center">
-                  <span className="text-xs text-muted-foreground">Total</span>
-                  <span className="text-sm font-bold text-foreground">
-                    {formatCurrency(pieChartData.totalAmount)}
-                  </span>
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.15fr_1fr]">
+        <section className="rounded-xl p-2 md:p-4">
+          <div className="flex items-center gap-2">
+            <BarChart3 className="h-5 w-5 text-primary" />
+            <h2 className="text-lg font-semibold text-foreground">Receipts grouped by name</h2>
+          </div>
+          <p className="mt-0.5 pl-7 text-sm text-muted-foreground">Amounts for selected start/end dates.</p>
+
+          <div className="mt-5 grid grid-cols-1 gap-8 md:grid-cols-[220px_1fr] md:items-center">
+            {pieChartData.slices.length === 0 ? (
+              <p className="text-sm text-muted-foreground">No receipt data in selected range.</p>
+            ) : (
+              <>
+                <div className="mx-auto">
+                  <div
+                    className="relative h-48 w-48 rounded-full"
+                    style={{ backgroundImage: pieChartData.conicGradient }}
+                    aria-label="Receipts distribution pie chart"
+                  >
+                    <div className="absolute inset-7 grid place-items-center rounded-full bg-card text-center">
+                      <span className="text-xs text-muted-foreground">Total</span>
+                      <span className="text-2xl font-bold text-foreground">
+                        {formatCurrency(pieChartData.totalAmount)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-3 pr-2">
+                  {pieChartData.slices.map((item) => (
+                    <div
+                      key={item.name}
+                      className="flex items-center justify-between rounded-lg bg-secondary/25 px-3 py-2"
+                    >
+                      <span className="flex items-center gap-2 font-medium text-foreground">
+                        <span
+                          className="inline-block h-2.5 w-2.5 rounded-full"
+                          style={{ backgroundColor: item.color }}
+                        />
+                        {item.name}
+                      </span>
+                      <span className="text-right">
+                        <span className="block text-sm font-semibold tabular-nums text-foreground">
+                          {formatCurrency(item.totalAmount)}
+                        </span>
+                        <span className="block text-xs text-muted-foreground">
+                          {item.percentage.toFixed(1)}%
+                        </span>
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+        </section>
+
+        <section className="rounded-xl p-2 md:p-4">
+          <div className="flex items-center gap-2">
+            <Gauge className="h-5 w-5 text-emerald-500" />
+            <h2 className="text-lg font-semibold text-foreground">Fleet Overview</h2>
+          </div>
+          <p className="mt-0.5 pl-7 text-sm text-muted-foreground">Vehicle utilization summary</p>
+
+          <div className="mt-5 divide-y divide-border rounded-lg border border-border/70 bg-secondary/10">
+            {fleetRows.map((row) => (
+              <div key={row.id} className="flex items-center justify-between px-3 py-2.5">
+                <div className="min-w-0">
+                  <p className="flex items-center gap-2 truncate text-sm font-semibold text-foreground">
+                    <Car className="h-3.5 w-3.5 text-muted-foreground" />
+                    {row.name}
+                  </p>
+                  <p className="truncate text-xs text-muted-foreground">{row.plateNumber}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm font-semibold tabular-nums text-foreground">{row.totalKm} km</p>
+                  <p className="text-xs tabular-nums text-muted-foreground">{row.fuelLiters.toFixed(1)} L</p>
                 </div>
               </div>
-            </div>
-
-            <div className="space-y-3">
-              {pieChartData.slices.map((item) => (
-                <div
-                  key={item.name}
-                  className="flex items-center justify-between rounded-lg bg-secondary/25 px-3 py-2"
-                >
-                  <span className="flex items-center gap-2 font-medium text-foreground">
-                    <span
-                      className="inline-block h-2.5 w-2.5 rounded-full"
-                      style={{ backgroundColor: item.color }}
-                    />
-                    {item.name}
-                  </span>
-                  <span className="text-right">
-                    <span className="block text-sm font-semibold tabular-nums text-foreground">
-                      {formatCurrency(item.totalAmount)}
-                    </span>
-                    <span className="block text-xs text-muted-foreground">
-                      {item.percentage.toFixed(1)}%
-                    </span>
-                  </span>
-                </div>
-              ))}
-            </div>
-          </>
-        )}
+            ))}
+          </div>
+        </section>
       </div>
     </section>
   )
