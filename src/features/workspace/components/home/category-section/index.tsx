@@ -1,7 +1,8 @@
-import { LayoutGrid, MapPin, Receipt } from 'lucide-react'
-import { Button } from '@/common/components/_base/button'
+import { LayoutGrid } from 'lucide-react'
 import { categories } from '@/common/mocks/categories'
 import { CategoryCard } from '../category-card'
+import { AddReceiptModalTrigger } from '../add-receipt-modal-trigger'
+import { AddRouteModalTrigger } from '../add-route-modal-trigger'
 
 const totalPeople = new Set(
   categories.flatMap((c) => c.assignedPeople.map((p) => p.id)),
@@ -26,14 +27,8 @@ export function CategorySection() {
 
           {/* Desktop buttons — hidden on mobile */}
           <div className="hidden items-center gap-2 md:flex">
-            <Button variant="outline" className="border-border text-foreground hover:bg-secondary">
-              <MapPin className="h-4 w-4 text-primary" />
-              Add Route
-            </Button>
-            <Button variant="default">
-              <Receipt className="h-4 w-4" />
-              Add Receipt
-            </Button>
+            <AddRouteModalTrigger />
+            <AddReceiptModalTrigger />
           </div>
         </div>
 
@@ -46,14 +41,8 @@ export function CategorySection() {
 
       {/* Mobile FABs — sit above the bottom nav (bottom-4 + ~56px nav height) */}
       <div className="fixed bottom-24 left-1/2 z-40 flex -translate-x-1/2 flex-row gap-2 md:hidden">
-        <Button size="lg" variant="outline" className="rounded-full border-border text-foreground shadow-lg hover:bg-secondary">
-          <MapPin className="h-5 w-5 text-primary" />
-          Add Route
-        </Button>
-        <Button size="lg" variant="default" className="rounded-full shadow-lg">
-          <Receipt className="h-5 w-5" />
-          Add Receipt
-        </Button>
+        <AddRouteModalTrigger mobile />
+        <AddReceiptModalTrigger mobile />
       </div>
     </>
   )

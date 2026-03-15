@@ -18,7 +18,7 @@ const InputField = React.forwardRef<HTMLInputElement, InputFieldProps>(
             placeholder=" "
             aria-invalid={!!error}
             className={cn(
-              'peer pt-5',
+              'peer pt-6',
               error && 'border-destructive focus-visible:border-destructive',
               className,
             )}
