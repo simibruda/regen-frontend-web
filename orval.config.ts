@@ -1,21 +1,25 @@
 import { defineConfig } from 'orval'
 
 export default defineConfig({
-  frontendApi: {
+  store: {
     input: {
-      target: './orval/openapi.yaml',
+      target: 'http://localhost:3000/static/docs/openapi.json',
     },
     output: {
-      mode: 'tags-split',
-      target: './src/api/_base/generated',
-      schemas: './src/api/_base/generated/model',
-      client: 'react-query',
+      headers: true,
+      mode: 'tags',
+      target: './src/common/api/_base/api-types.ts',
+      mock: false,
       override: {
         mutator: {
-          path: './src/common/api/_base/client.ts',
+          path: './src/lib/axios.ts',
           name: 'customInstance',
         },
       },
     },
+    hooks: {
+      afterAllFilesWrite: 'prettier --write',
+    },
   },
 })
+
