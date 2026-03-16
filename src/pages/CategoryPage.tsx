@@ -68,14 +68,7 @@ export function CategoryPage() {
   }, [filteredReceipts])
 
   const pieChartData = useMemo(() => {
-    const palette: [string, string][] = [
-      ['#1f4bb8', '#4c7be0'],
-      ['#0ea5a3', '#34d399'],
-      ['#f59e0b', '#fbbf24'],
-      ['#a855f7', '#d946ef'],
-      ['#ef4444', '#f97316'],
-      ['#06b6d4', '#60a5fa'],
-    ]
+    const palette = ['#4c7be0', '#34d399', '#fbbf24', '#d946ef', '#f97316', '#60a5fa']
     const totalAmount = receiptChartData.reduce((sum, item) => sum + item.totalAmount, 0)
 
     const slices = receiptChartData.reduce<
@@ -83,8 +76,6 @@ export function CategoryPage() {
         name: string
         totalAmount: number
         color: string
-        gradientStart: string
-        gradientEnd: string
         percentage: number
         start: number
         end: number
@@ -92,13 +83,11 @@ export function CategoryPage() {
     >((acc, item, index) => {
       const percentage = totalAmount === 0 ? 0 : (item.totalAmount / totalAmount) * 100
       const start = acc[index - 1]?.end ?? 0
-      const [gradientStart, gradientEnd] = palette[index % palette.length]
+      const color = palette[index % palette.length]
 
       acc.push({
         ...item,
-        color: gradientEnd,
-        gradientStart,
-        gradientEnd,
+        color,
         percentage,
         start,
         end: start + percentage,
@@ -115,8 +104,7 @@ export function CategoryPage() {
               (slice) => {
                 const start = slice.start.toFixed(2)
                 const end = Math.min(slice.end, 100).toFixed(2)
-                const mid = ((slice.start + Math.min(slice.end, 100)) / 2).toFixed(2)
-                return `${slice.gradientStart} ${start}% ${mid}%, ${slice.gradientEnd} ${mid}% ${end}%`
+                return `${slice.color} ${start}% ${end}%`
               },
             )
             .join(', ')})`
