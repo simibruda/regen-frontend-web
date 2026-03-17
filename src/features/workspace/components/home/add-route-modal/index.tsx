@@ -23,10 +23,7 @@ const stopSchema = z.object({
 })
 
 const routeSchema = z.object({
-  startKm: z
-    .string()
-    .min(1, 'Start KM is required')
-    .regex(/^\d+(\.\d{1,2})?$/, 'Enter a valid number (max 2 decimals)'),
+  startKm: z.number().min(1, 'Start KM is required'),
   date: z.string().min(1, 'Date is required'),
   carId: z.string().min(1, 'Car is required'),
   stops: z
@@ -46,10 +43,14 @@ type AddRouteModalProps = {
 }
 
 const defaultValues: RouteFormValues = {
-  startKm: '',
+  startKm: 0,
   date: dayjs().format('YYYY-MM-DD'),
   carId: '',
   stops: [{ order: 1, name: '' }],
+}
+
+function formatKmWithSpaces(value: string) {
+  return value.replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
 }
 
 export function AddRouteModal({ open, onOpenChange }: AddRouteModalProps) {
@@ -131,13 +132,30 @@ export function AddRouteModal({ open, onOpenChange }: AddRouteModalProps) {
           </DialogDescription>
         </DialogHeader>
 
-        <form className="flex flex-col gap-2 overflow-y-auto px-4" onSubmit={handleSubmit(onSubmit)}>
-          <InputField
-            id="startKm"
-            label="Start KM"
-            inputMode="decimal"
-            error={errors.startKm?.message}
-            {...register('startKm')}
+        <form
+          className="flex flex-col gap-2 overflow-y-auto px-4"
+          onSubmit={handleSubmit(onSubmit)}
+        >
+          <Controller
+            name="startKm"
+            control={control}
+            render={({ field: { value, onChange, onBlur, name, ref } }) => (
+              <InputField
+                id="startKm"
+                name={name}
+                ref={ref}
+                label="Start KM"
+                type="text"
+                inputMode="numeric"
+                value={formatKmWithSpaces(value?.toString() ?? '')}
+                onBlur={onBlur}
+                onChange={(event) => {
+                  const digitsOnly = event.target.value.replace(/\D/g, '')
+                  onChange(digitsOnly)
+                }}
+                error={errors.startKm?.message}
+              />
+            )}
           />
 
           <InputField
@@ -192,7 +210,9 @@ export function AddRouteModal({ open, onOpenChange }: AddRouteModalProps) {
                   <div className="mb-2 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <GripVertical className="h-4 w-4 cursor-grab text-accent" />
-                      <span className="text-xs font-semibold text-foreground">Stop #{index + 1}</span>
+                      <span className="text-xs font-semibold text-foreground">
+                        Stop #{index + 1}
+                      </span>
                     </div>
                     <Button
                       type="button"
