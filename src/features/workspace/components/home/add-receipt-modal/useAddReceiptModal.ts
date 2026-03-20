@@ -99,6 +99,7 @@ export function useAddReceiptModal() {
         },
       })
       await queryClient.invalidateQueries({ queryKey: [QUERY_KEY.RECEIPT] })
+      await queryClient.invalidateQueries({ queryKey: [QUERY_KEY.CATEGORY] })
       toast.success('Receipt created successfully')
       handleOpenChange(false)
     } catch (error) {

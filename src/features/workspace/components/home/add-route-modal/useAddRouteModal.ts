@@ -126,7 +126,8 @@ export function useAddRouteModal() {
           })),
         },
       })
-      await queryClient.invalidateQueries({ queryKey: [QUERY_KEY.ROUTE] })
+      await queryClient.invalidateQueries({ queryKey: [QUERY_KEY.ROUTE] });
+      await queryClient.invalidateQueries({ queryKey: [QUERY_KEY.CATEGORY] })
       toast.success('Route created successfully')
       handleClose()
     } catch (error) {
