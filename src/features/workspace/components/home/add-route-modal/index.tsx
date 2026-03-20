@@ -104,7 +104,7 @@ export function AddRouteModal({ mobile = false }: AddRouteModalProps) {
                   onBlur={onBlur}
                   onChange={(event) => {
                     const digitsOnly = event.target.value.replace(/\D/g, '')
-                    onChange(digitsOnly)
+                    onChange(digitsOnly === '' ? 0 : Number(digitsOnly))
                   }}
                   error={errors.startKm?.message}
                 />
@@ -126,8 +126,10 @@ export function AddRouteModal({ mobile = false }: AddRouteModalProps) {
                 <SearchableSelectField
                   id="categoryId"
                   label="Category"
+                  placeholder="Select a category"
                   searchPlaceholder="Search categories..."
                   noOptionsText="No categories found."
+                  error={errors.categoryId?.message}
                   options={filteredCategoryOptions}
                   value={value}
                   onValueChange={onChange}

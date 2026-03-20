@@ -369,6 +369,16 @@ export interface WorkspaceCarTotalKmResponse {
   averageLiterConsumed: number
 }
 
+export type CreateRouteRequestRouteItemsItem = {
+  /** @minLength 1 */
+  name: string
+  /**
+   * @minimum 0
+   * @maximum 9007199254740991
+   */
+  order: number
+}
+
 export interface CreateRouteRequest {
   /** @minimum 0 */
   startKm: number
@@ -376,6 +386,9 @@ export interface CreateRouteRequest {
   date: string
   /** @minLength 1 */
   carId: string
+  /** @minLength 1 */
+  categoryId: string
+  routeItems?: CreateRouteRequestRouteItemsItem[]
 }
 
 export type GetMyRoutesRequestSortOrder =
@@ -392,6 +405,11 @@ export type GetMyRoutesRequestWhereUserId =
   | { [key: string]: boolean }
 
 export type GetMyRoutesRequestWhereCarId =
+  | { [key: string]: string }
+  | { [key: string]: number }
+  | { [key: string]: boolean }
+
+export type GetMyRoutesRequestWhereCategoryId =
   | { [key: string]: string }
   | { [key: string]: number }
   | { [key: string]: boolean }
@@ -414,6 +432,7 @@ export type GetMyRoutesRequestWhereDate =
 export type GetMyRoutesRequestWhere = {
   userId?: GetMyRoutesRequestWhereUserId
   carId?: GetMyRoutesRequestWhereCarId
+  categoryId?: GetMyRoutesRequestWhereCategoryId
   startKm?: GetMyRoutesRequestWhereStartKm
   endKm?: GetMyRoutesRequestWhereEndKm
   date?: GetMyRoutesRequestWhereDate
@@ -485,6 +504,11 @@ export type GetRoutesByWorkspaceRequestWhereCarId =
   | { [key: string]: number }
   | { [key: string]: boolean }
 
+export type GetRoutesByWorkspaceRequestWhereCategoryId =
+  | { [key: string]: string }
+  | { [key: string]: number }
+  | { [key: string]: boolean }
+
 export type GetRoutesByWorkspaceRequestWhereStartKm =
   | { [key: string]: string }
   | { [key: string]: number }
@@ -503,6 +527,7 @@ export type GetRoutesByWorkspaceRequestWhereDate =
 export type GetRoutesByWorkspaceRequestWhere = {
   userId?: GetRoutesByWorkspaceRequestWhereUserId
   carId?: GetRoutesByWorkspaceRequestWhereCarId
+  categoryId?: GetRoutesByWorkspaceRequestWhereCategoryId
   startKm?: GetRoutesByWorkspaceRequestWhereStartKm
   endKm?: GetRoutesByWorkspaceRequestWhereEndKm
   date?: GetRoutesByWorkspaceRequestWhereDate
@@ -633,11 +658,6 @@ export interface ReceiptWorkspaceResponse {
   createdAt: string
   /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
   updatedAt: string
-}
-
-export interface ReceiptBlobResponse {
-  receiptId: string
-  blobUrl: string
 }
 
 export interface WorkspacePublicResponse {

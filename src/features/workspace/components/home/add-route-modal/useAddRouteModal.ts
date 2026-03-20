@@ -16,7 +16,7 @@ const stopSchema = z.object({
 const routeSchema = z.object({
   startKm: z.number().min(1, 'Start KM is required'),
   date: z.string().min(1, 'Date is required'),
-  categoryId: z.string().optional(),
+  categoryId: z.string().min(1, 'Category is required'),
   carId: z.string().min(1, 'Car is required'),
   stops: z
     .array(stopSchema)
@@ -29,8 +29,8 @@ const routeSchema = z.object({
 
 type RouteFormValues = z.infer<typeof routeSchema>
 
-const defaultValues: RouteFormValues = {
-  startKm: 0,
+const defaultValues = {
+  startKm: undefined,
   date: dayjs().format('YYYY-MM-DD'),
   categoryId: '',
   carId: '',
@@ -118,7 +118,12 @@ export function useAddRouteModal() {
         request: {
           startKm: Number(data.startKm),
           date: dayjs(data.date).startOf('day').toISOString(),
+          categoryId: data.categoryId,
           carId: data.carId,
+          routeItems: data.stops.map((stop) => ({
+            name: stop.name,
+            order: stop.order,
+          })),
         },
       })
       await queryClient.invalidateQueries({ queryKey: [QUERY_KEY.ROUTE] })

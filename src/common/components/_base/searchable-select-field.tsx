@@ -1,13 +1,6 @@
 import { cn } from '@/lib/utils'
-import { useRef, useState } from 'react'
-import {
-  Select,
-  SelectItem,
-  SelectList,
-  SelectPopup,
-  SelectTrigger,
-  SelectValue,
-} from './select'
+import { useMemo, useState } from 'react'
+import { Select, SelectItem, SelectList, SelectPopup, SelectTrigger, SelectValue } from './select'
 
 type SearchableSelectOption = {
   value: string
@@ -44,21 +37,26 @@ function SearchableSelectField({
   id,
 }: SearchableSelectFieldProps) {
   const [isOpen, setIsOpen] = useState(false)
-  const cachedLabelsByValueRef = useRef<Record<string, string>>({})
-
-  for (const option of options) {
-    cachedLabelsByValueRef.current[option.value] = option.label
-  }
+  const [selectedLabelFallback, setSelectedLabelFallback] = useState('')
 
   const hasValue = value !== undefined && value !== ''
-  const selectedLabel = hasValue
-    ? options.find((option) => option.value === value)?.label ?? cachedLabelsByValueRef.current[value]
-    : undefined
-  const optionsWithSelected = [...options]
+  const selectedLabelFromOptions = useMemo(() => {
+    if (!hasValue) {
+      return undefined
+    }
+    return options.find((option) => option.value === value)?.label
+  }, [hasValue, options, value])
 
-  if (hasValue && selectedLabel && !optionsWithSelected.some((option) => option.value === value)) {
-    optionsWithSelected.unshift({ value, label: selectedLabel })
-  }
+  const selectedLabel = selectedLabelFromOptions ?? selectedLabelFallback
+  const optionsWithSelected = useMemo(() => {
+    const nextOptions = [...options]
+
+    if (hasValue && selectedLabel && !nextOptions.some((option) => option.value === value)) {
+      nextOptions.unshift({ value, label: selectedLabel })
+    }
+
+    return nextOptions
+  }, [hasValue, options, selectedLabel, value])
 
   return (
     <div>
@@ -71,12 +69,15 @@ function SearchableSelectField({
             onValueChange?.(resolvedValue)
 
             if (!resolvedValue) {
+              setSelectedLabelFallback('')
               return
             }
 
-            const resolvedLabel = optionsWithSelected.find((option) => option.value === resolvedValue)?.label
+            const resolvedLabel = optionsWithSelected.find(
+              (option) => option.value === resolvedValue
+            )?.label
             if (resolvedLabel) {
-              cachedLabelsByValueRef.current[resolvedValue] = resolvedLabel
+              setSelectedLabelFallback(resolvedLabel)
             }
           }}
           onOpenChange={(nextOpen) => {
@@ -91,10 +92,10 @@ function SearchableSelectField({
             aria-invalid={!!error}
             className={cn(
               'peer pt-5',
-              error && 'border-destructive focus-visible:border-destructive',
+              error && 'border-destructive focus-visible:border-destructive'
             )}
           >
-            <SelectValue placeholder={placeholder ?? ''} />
+            <SelectValue placeholder={placeholder ?? ''}>{selectedLabel}</SelectValue>
           </SelectTrigger>
           <SelectPopup>
             <div className="px-2 pb-2">
@@ -127,7 +128,7 @@ function SearchableSelectField({
           className={cn(
             'pointer-events-none absolute left-2.5 transition-all',
             hasValue || isOpen ? 'top-1 text-xs' : 'top-3 text-sm',
-            error ? 'text-destructive' : 'text-black/50',
+            error ? 'text-destructive' : 'text-black/50'
           )}
         >
           {label}

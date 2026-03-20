@@ -8,7 +8,6 @@
 import type {
   GetReceiptsByWorkspaceRequest,
   MutationResponse,
-  ReceiptBlobResponse,
   ReceiptControllerAddRecipeBody,
   ReceiptControllerAddRecipeHeaders,
   ReceiptControllerGetReceiptBlobHeaders,
@@ -61,16 +60,16 @@ export const receiptControllerGetWorkspaceReceipts = (
   )
 }
 /**
- * Retrieve the blob URL for a specific receipt in the authenticated workspace.
+ * Retrieve the receipt file binary for a specific receipt in the authenticated workspace.
  * @summary Get receipt blob
  */
 export const receiptControllerGetReceiptBlob = (
   receiptId: string,
   headers: ReceiptControllerGetReceiptBlobHeaders,
-  options?: SecondParameter<typeof customInstance<ReceiptBlobResponse>>
+  options?: SecondParameter<typeof customInstance<Blob>>
 ) => {
-  return customInstance<ReceiptBlobResponse>(
-    { url: `/workspace/receipt/${receiptId}/blob`, method: 'GET', headers },
+  return customInstance<Blob>(
+    { url: `/workspace/receipt/${receiptId}/blob`, method: 'GET', headers, responseType: 'blob' },
     options
   )
 }
