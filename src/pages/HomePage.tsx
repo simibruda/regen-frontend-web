@@ -3,6 +3,7 @@ import { Loader } from '@/common/components/_base/loader'
 import type { Category } from '@/common/mocks/categories'
 import { CategorySection } from '@/features/workspace/components/home/category-section'
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
+import { useCallback } from 'react'
 
 export function HomePage() {
   const { data: currentUser, isLoading: isCurrentUserLoading } = useQuery({
@@ -11,7 +12,13 @@ export function HomePage() {
 
   const workspaceId = currentUser?.workspaceId ?? ''
 
-  const { data: myCategories, isLoading: isCategoriesLoading } = useInfiniteQuery({
+  const {
+    data: myCategories,
+    isLoading: isCategoriesLoading,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+  } = useInfiniteQuery({
     ...apiOptions.queries.getMyInfiniteCategories(workspaceId),
     enabled: Boolean(workspaceId),
   })
@@ -25,6 +32,14 @@ export function HomePage() {
     })),
   }))
 
+  const handleLoadMore = useCallback(() => {
+    if (!hasNextPage || isFetchingNextPage) {
+      return
+    }
+
+    void fetchNextPage()
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage])
+
   if (isCurrentUserLoading || isCategoriesLoading) {
     return (
       <main className="min-h-full bg-background p-4 pb-36 md:p-5 md:pb-5">
@@ -37,7 +52,12 @@ export function HomePage() {
 
   return (
     <main className="min-h-full bg-background p-4 pb-36 md:p-5 md:pb-5">
-      <CategorySection categories={categories} />
+      <CategorySection
+        categories={categories}
+        hasNextPage={Boolean(hasNextPage)}
+        isFetchingNextPage={isFetchingNextPage}
+        onLoadMore={handleLoadMore}
+      />
     </main>
   )
 }

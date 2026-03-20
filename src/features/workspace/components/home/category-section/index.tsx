@@ -3,13 +3,42 @@ import type { Category } from '@/common/mocks/categories'
 import { CategoryCard } from '../category-card'
 import { AddRouteModal } from '../add-route-modal'
 import { AddReceiptModal } from '../add-receipt-modal'
+import { useEffect, useRef } from 'react'
 
 type CategorySectionProps = {
   categories: Category[]
+  hasNextPage: boolean
+  isFetchingNextPage: boolean
+  onLoadMore: () => void
 }
 
-export function  CategorySection({ categories }: CategorySectionProps) {
+export function CategorySection({
+  categories,
+  hasNextPage,
+  isFetchingNextPage,
+  onLoadMore,
+}: CategorySectionProps) {
+  const loadMoreRef = useRef<HTMLDivElement | null>(null)
   const totalPeople = new Set(categories.flatMap((c) => c.assignedPeople.map((p) => p.id))).size
+
+  useEffect(() => {
+    if (!hasNextPage || isFetchingNextPage || !loadMoreRef.current) {
+      return
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries
+        if (entry?.isIntersecting) {
+          onLoadMore()
+        }
+      },
+      { rootMargin: '200px 0px' }
+    )
+
+    observer.observe(loadMoreRef.current)
+    return () => observer.disconnect()
+  }, [hasNextPage, isFetchingNextPage, onLoadMore])
 
   return (
     <>
@@ -39,6 +68,16 @@ export function  CategorySection({ categories }: CategorySectionProps) {
             <CategoryCard key={category.id} category={category} />
           ))}
         </section>
+
+        <div ref={loadMoreRef} className="py-4 text-center text-sm text-muted-foreground">
+          {isFetchingNextPage
+            ? 'Loading more categories...'
+            : hasNextPage
+              ? 'Scroll to load more'
+              : categories.length > 0
+                ? 'All categories loaded.'
+                : 'No categories found.'}
+        </div>
       </div>
 
       {/* Mobile FABs — sit above the bottom nav (bottom-4 + ~56px nav height) */}
