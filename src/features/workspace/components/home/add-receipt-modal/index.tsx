@@ -14,6 +14,7 @@ import { categories } from '@/common/mocks/categories'
 import { zodResolver } from '@hookform/resolvers/zod'
 import dayjs from 'dayjs'
 import { Receipt } from 'lucide-react'
+import { useState } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { z } from 'zod'
 
@@ -41,8 +42,7 @@ const receiptSchema = z.object({
 type ReceiptFormValues = z.infer<typeof receiptSchema>
 
 type AddReceiptModalProps = {
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  mobile?: boolean
 }
 
 const defaultValues = {
@@ -52,7 +52,8 @@ const defaultValues = {
   categoryId: '',
 }
 
-export function AddReceiptModal({ open, onOpenChange }: AddReceiptModalProps) {
+export function AddReceiptModal({ mobile = false }: AddReceiptModalProps) {
+  const [open, setOpen] = useState(false)
   const {
     register,
     handleSubmit,
@@ -68,7 +69,7 @@ export function AddReceiptModal({ open, onOpenChange }: AddReceiptModalProps) {
     if (!nextOpen) {
       reset(defaultValues)
     }
-    onOpenChange(nextOpen)
+    setOpen(nextOpen)
   }
 
   function onSubmit(data: ReceiptFormValues) {
@@ -81,96 +82,115 @@ export function AddReceiptModal({ open, onOpenChange }: AddReceiptModalProps) {
   }
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent>
-        <DialogHeader className="rounded-t-2xl bg-gradient-to-r from-primary to-primary-2 p-4 pb-3">
-          <DialogTitle className="flex items-center gap-2 text-white">
-            <Receipt className="h-5 w-5" />
-            Add Receipt
-          </DialogTitle>
-          <DialogDescription className="text-white/75">
-            Fill in all details to add a new receipt.
-          </DialogDescription>
-        </DialogHeader>
-
-        <form
-          className="flex flex-col gap-2 overflow-y-auto px-4"
-          onSubmit={handleSubmit(onSubmit)}
+    <>
+      {mobile ? (
+        <Button
+          size="lg"
+          variant="default"
+          className="rounded-full shadow-lg"
+          onClick={() => setOpen(true)}
         >
-          <InputField
-            id="place"
-            label="Place"
-            error={errors.place?.message}
-            {...register('place')}
-          />
+          <Receipt className="h-5 w-5" />
+          Add Receipt
+        </Button>
+      ) : (
+        <Button variant="default" onClick={() => setOpen(true)}>
+          <Receipt className="h-4 w-4" />
+          Add Receipt
+        </Button>
+      )}
 
-          <InputField
-            id="date"
-            type="date"
-            label="Date"
-            error={errors.date?.message}
-            {...register('date')}
-          />
+      <Dialog open={open} onOpenChange={handleOpenChange}>
+        <DialogContent>
+          <DialogHeader className="rounded-t-2xl bg-linear-to-r from-primary to-primary-2 p-4 pb-3">
+            <DialogTitle className="flex items-center gap-2 text-white">
+              <Receipt className="h-5 w-5" />
+              Add Receipt
+            </DialogTitle>
+            <DialogDescription className="text-white/75">
+              Fill in all details to add a new receipt.
+            </DialogDescription>
+          </DialogHeader>
 
-          <Controller
-            name="amount"
-            control={control}
-            render={({ field }) => (
-              <InputField
-                id="amount"
-                type="number"
-                value={field.value || ''}
-                label="Amount"
-                error={errors.amount?.message}
-                ref={field.ref}
-                onChange={(e) => {
-                  if (e.target.value === '') return field.onChange(undefined)
-                  const num = parseFloat(parseFloat(e.target.value).toFixed(2))
-                  if (!Number.isNaN(num)) field.onChange(num)
-                }}
-              />
-            )}
-          />
-          <Controller
-            name="categoryId"
-            control={control}
-            render={({ field: { onChange, value } }) => (
-              <SelectField
-                id="categoryId"
-                label="Category"
-                error={errors.categoryId?.message}
-                options={categories.map((c) => ({ value: c.id, label: c.name }))}
-                value={value}
-                onValueChange={onChange}
-              />
-            )}
-          />
+          <form
+            className="flex flex-col gap-2 overflow-y-auto px-4"
+            onSubmit={handleSubmit(onSubmit)}
+          >
+            <InputField
+              id="place"
+              label="Place"
+              error={errors.place?.message}
+              {...register('place')}
+            />
 
-          <Controller
-            name="file"
-            control={control}
-            render={({ field: { onChange, value } }) => (
-              <Dropzone value={value} onChange={onChange} error={errors.file?.message} />
-            )}
-          />
+            <InputField
+              id="date"
+              type="date"
+              label="Date"
+              error={errors.date?.message}
+              {...register('date')}
+            />
 
-          <DialogFooter className="border-t border-border/50 px-0">
-            <div className="flex gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                className="flex-1 border-border text-foreground hover:bg-secondary"
-                onClick={handleClose}
-              >
-                Cancel
-              </Button>
-              <Button type="submit" variant="default" className="flex-1" disabled={isSubmitting}>
-                {isSubmitting ? 'Saving...' : 'Save Receipt'}
-              </Button>
-            </div>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+            <Controller
+              name="amount"
+              control={control}
+              render={({ field }) => (
+                <InputField
+                  id="amount"
+                  type="number"
+                  value={field.value || ''}
+                  label="Amount"
+                  error={errors.amount?.message}
+                  ref={field.ref}
+                  onChange={(e) => {
+                    if (e.target.value === '') return field.onChange(undefined)
+                    const num = parseFloat(parseFloat(e.target.value).toFixed(2))
+                    if (!Number.isNaN(num)) field.onChange(num)
+                  }}
+                />
+              )}
+            />
+            <Controller
+              name="categoryId"
+              control={control}
+              render={({ field: { onChange, value } }) => (
+                <SelectField
+                  id="categoryId"
+                  label="Category"
+                  error={errors.categoryId?.message}
+                  options={categories.map((c) => ({ value: c.id, label: c.name }))}
+                  value={value}
+                  onValueChange={onChange}
+                />
+              )}
+            />
+
+            <Controller
+              name="file"
+              control={control}
+              render={({ field: { onChange, value } }) => (
+                <Dropzone value={value} onChange={onChange} error={errors.file?.message} />
+              )}
+            />
+
+            <DialogFooter className="border-t border-border/50 px-0">
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="flex-1 border-border text-foreground hover:bg-secondary"
+                  onClick={handleClose}
+                >
+                  Cancel
+                </Button>
+                <Button type="submit" variant="default" className="flex-1" disabled={isSubmitting}>
+                  {isSubmitting ? 'Saving...' : 'Save Receipt'}
+                </Button>
+              </div>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }

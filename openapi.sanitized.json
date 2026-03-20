@@ -392,7 +392,7 @@
         ]
       }
     },
-    "/workspace/category/my-categories": {
+    "/category/my-categories": {
       "post": {
         "description": "Retrieve categories assigned to the authenticated user in the current workspace with optional filters, sorting, and pagination.",
         "operationId": "CategoryController_getMyCategories",
@@ -453,7 +453,7 @@
         ]
       }
     },
-    "/workspace/category/workspace": {
+    "/category/workspace": {
       "post": {
         "description": "Retrieve categories from the authenticated workspace with optional filters, sorting, and pagination. Admin role required.",
         "operationId": "CategoryController_getWorkspaceCategories",
@@ -514,7 +514,77 @@
         ]
       }
     },
-    "/workspace/category/create": {
+    "/category/{categoryId}/assign-users": {
+      "post": {
+        "description": "Assign users from the authenticated workspace to a category. Accessible only by admin users.",
+        "operationId": "CategoryController_assignUsersToCategory",
+        "parameters": [
+          {
+            "name": "categoryId",
+            "required": true,
+            "in": "path",
+            "description": "Category ID to assign users to",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "workspace-id",
+            "in": "header",
+            "description": "Workspace ID associated with the authenticated user",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "Users to assign to category",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssignUsersToCategoryRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Users assigned to category successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MutationResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing or invalid workspace header or request payload"
+          },
+          "401": {
+            "description": "Missing or invalid JWT token"
+          },
+          "403": {
+            "description": "Workspace access is forbidden or admin role is required"
+          },
+          "404": {
+            "description": "Category or users were not found in the authenticated workspace"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Assign users to category",
+        "tags": [
+          "Category"
+        ]
+      }
+    },
+    "/category/create": {
       "post": {
         "description": "Create a new category in the authenticated workspace. Accessible only by manager users.",
         "operationId": "CategoryController_createCategory",
@@ -1410,6 +1480,10 @@
                 ]
               }
             }
+          },
+          "searchValue": {
+            "type": "string",
+            "minLength": 1
           }
         }
       },
@@ -1670,6 +1744,21 @@
             }
           }
         }
+      },
+      "AssignUsersToCategoryRequest": {
+        "type": "object",
+        "properties": {
+          "userIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "required": [
+          "userIds"
+        ]
       },
       "CreateCategoryRequest": {
         "type": "object",

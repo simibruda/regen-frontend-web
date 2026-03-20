@@ -6,6 +6,8 @@
  * OpenAPI spec version: 1.0
  */
 import type {
+  AssignUsersToCategoryRequest,
+  CategoryControllerAssignUsersToCategoryHeaders,
   CategoryControllerCreateCategoryHeaders,
   CategoryControllerGetMyCategoriesHeaders,
   CategoryControllerGetWorkspaceCategoriesHeaders,
@@ -31,7 +33,7 @@ export const categoryControllerGetMyCategories = (
 ) => {
   return customInstance<GetCategoriesResponse[]>(
     {
-      url: `/workspace/category/my-categories`,
+      url: `/category/my-categories`,
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...headers },
       data: getMyCategoriesRequest,
@@ -50,10 +52,30 @@ export const categoryControllerGetWorkspaceCategories = (
 ) => {
   return customInstance<GetCategoriesResponse[]>(
     {
-      url: `/workspace/category/workspace`,
+      url: `/category/workspace`,
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...headers },
       data: getWorkspaceCategoriesRequest,
+    },
+    options
+  )
+}
+/**
+ * Assign users from the authenticated workspace to a category. Accessible only by admin users.
+ * @summary Assign users to category
+ */
+export const categoryControllerAssignUsersToCategory = (
+  categoryId: string,
+  assignUsersToCategoryRequest: AssignUsersToCategoryRequest,
+  headers: CategoryControllerAssignUsersToCategoryHeaders,
+  options?: SecondParameter<typeof customInstance<MutationResponse>>
+) => {
+  return customInstance<MutationResponse>(
+    {
+      url: `/category/${categoryId}/assign-users`,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...headers },
+      data: assignUsersToCategoryRequest,
     },
     options
   )
@@ -69,7 +91,7 @@ export const categoryControllerCreateCategory = (
 ) => {
   return customInstance<MutationResponse>(
     {
-      url: `/workspace/category/create`,
+      url: `/category/create`,
       method: 'POST',
       headers: { 'Content-Type': 'application/json', ...headers },
       data: createCategoryRequest,
@@ -82,6 +104,9 @@ export type CategoryControllerGetMyCategoriesResult = NonNullable<
 >
 export type CategoryControllerGetWorkspaceCategoriesResult = NonNullable<
   Awaited<ReturnType<typeof categoryControllerGetWorkspaceCategories>>
+>
+export type CategoryControllerAssignUsersToCategoryResult = NonNullable<
+  Awaited<ReturnType<typeof categoryControllerAssignUsersToCategory>>
 >
 export type CategoryControllerCreateCategoryResult = NonNullable<
   Awaited<ReturnType<typeof categoryControllerCreateCategory>>

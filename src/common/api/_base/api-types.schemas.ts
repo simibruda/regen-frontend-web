@@ -98,6 +98,8 @@ export interface GetUsersByWorkspaceRequest {
   sortBy?: string
   sortOrder?: GetUsersByWorkspaceRequestSortOrder
   where?: GetUsersByWorkspaceRequestWhere
+  /** @minLength 1 */
+  searchValue?: string
 }
 
 export type UserWorkspaceResponseRole =
@@ -216,6 +218,10 @@ export interface GetWorkspaceCategoriesRequest {
   sortBy?: string
   sortOrder?: GetWorkspaceCategoriesRequestSortOrder
   where?: GetWorkspaceCategoriesRequestWhere
+}
+
+export interface AssignUsersToCategoryRequest {
+  userIds: string[]
 }
 
 export interface CreateCategoryRequest {
@@ -653,6 +659,13 @@ export type CategoryControllerGetMyCategoriesHeaders = {
 }
 
 export type CategoryControllerGetWorkspaceCategoriesHeaders = {
+  /**
+   * Workspace ID associated with the authenticated user
+   */
+  'workspace-id': string
+}
+
+export type CategoryControllerAssignUsersToCategoryHeaders = {
   /**
    * Workspace ID associated with the authenticated user
    */

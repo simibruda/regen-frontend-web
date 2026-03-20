@@ -1,8 +1,8 @@
 import { LayoutGrid } from 'lucide-react'
 import type { Category } from '@/common/mocks/categories'
 import { CategoryCard } from '../category-card'
-import { AddReceiptModalTrigger } from '../add-receipt-modal-trigger'
-import { AddRouteModalTrigger } from '../add-route-modal-trigger'
+import { AddRouteModal } from '../add-route-modal'
+import { AddReceiptModal } from '../add-receipt-modal'
 
 type CategorySectionProps = {
   categories: Category[]
@@ -29,8 +29,8 @@ export function  CategorySection({ categories }: CategorySectionProps) {
 
           {/* Desktop buttons — hidden on mobile */}
           <div className="hidden items-center gap-2 md:flex">
-            <AddRouteModalTrigger />
-            <AddReceiptModalTrigger />
+            <AddRouteModal />
+            <AddReceiptModal />
           </div>
         </div>
 
@@ -43,8 +43,8 @@ export function  CategorySection({ categories }: CategorySectionProps) {
 
       {/* Mobile FABs — sit above the bottom nav (bottom-4 + ~56px nav height) */}
       <div className="fixed bottom-24 left-1/2 z-40 flex -translate-x-1/2 flex-row gap-2 md:hidden">
-        <AddRouteModalTrigger mobile />
-        <AddReceiptModalTrigger mobile />
+        <AddRouteModal mobile />
+        <AddReceiptModal mobile />
       </div>
     </>
   )

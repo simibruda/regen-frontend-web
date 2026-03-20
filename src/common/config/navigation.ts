@@ -8,7 +8,7 @@ export type NavItem = {
 
 export const managerNavigation: NavItem[] = [
   { title: 'Home', to: '/', icon: Home },
-  { title: 'Categories', to: '/categories', icon: Settings },
+  { title: 'Categories', to: '/categories-config', icon: Settings },
   { title: 'Cars', to: '/cars', icon: Car },
   { title: 'Users', to: '/users', icon: Users },
 ]

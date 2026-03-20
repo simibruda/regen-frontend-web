@@ -38,8 +38,7 @@ const routeSchema = z.object({
 type RouteFormValues = z.infer<typeof routeSchema>
 
 type AddRouteModalProps = {
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  mobile?: boolean
 }
 
 const defaultValues: RouteFormValues = {
@@ -53,7 +52,8 @@ function formatKmWithSpaces(value: string) {
   return value.replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
 }
 
-export function AddRouteModal({ open, onOpenChange }: AddRouteModalProps) {
+export function AddRouteModal({ mobile = false }: AddRouteModalProps) {
+  const [open, setOpen] = useState(false)
   const [dragIndex, setDragIndex] = useState<number | null>(null)
   const {
     register,
@@ -87,7 +87,7 @@ export function AddRouteModal({ open, onOpenChange }: AddRouteModalProps) {
       reset(defaultValues)
       setDragIndex(null)
     }
-    onOpenChange(nextOpen)
+    setOpen(nextOpen)
   }
 
   function handleClose() {
@@ -120,9 +120,31 @@ export function AddRouteModal({ open, onOpenChange }: AddRouteModalProps) {
   }
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent>
-        <DialogHeader className="rounded-t-2xl bg-gradient-to-r from-primary to-primary-2 p-4 pb-3">
+    <>
+      {mobile ? (
+        <Button
+          size="lg"
+          variant="outline"
+          className="rounded-full border-border text-foreground shadow-lg hover:bg-secondary"
+          onClick={() => setOpen(true)}
+        >
+          <MapPin className="h-5 w-5 text-primary" />
+          Add Route
+        </Button>
+      ) : (
+        <Button
+          variant="outline"
+          className="border-border text-foreground hover:bg-secondary"
+          onClick={() => setOpen(true)}
+        >
+          <MapPin className="h-4 w-4 text-primary" />
+          Add Route
+        </Button>
+      )}
+
+      <Dialog open={open} onOpenChange={handleOpenChange}>
+        <DialogContent>
+        <DialogHeader className="rounded-t-2xl bg-linear-to-r from-primary to-primary-2 p-4 pb-3">
           <DialogTitle className="flex items-center gap-2 text-white">
             <MapPin className="h-5 w-5" />
             Add Route
@@ -270,7 +292,8 @@ export function AddRouteModal({ open, onOpenChange }: AddRouteModalProps) {
             </div>
           </DialogFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }
