@@ -9,77 +9,32 @@ import {
 } from '@/common/components/_base/dialog'
 import { Dropzone } from '@/common/components/_base/dropzone'
 import { InputField } from '@/common/components/_base/input-field'
-import { SelectField } from '@/common/components/_base/select-field'
-import { categories } from '@/common/mocks/categories'
-import { zodResolver } from '@hookform/resolvers/zod'
-import dayjs from 'dayjs'
+import { SearchableSelectField } from '@/common/components/_base/searchable-select-field'
 import { Receipt } from 'lucide-react'
-import { useState } from 'react'
-import { Controller, useForm } from 'react-hook-form'
-import { z } from 'zod'
-
-const ACCEPTED_TYPES = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png']
-const MAX_SIZE = 10 * 1024 * 1024
-const MAX_DECIMALS = 2
-
-const receiptSchema = z.object({
-  place: z.string().min(1, 'Place is required'),
-  date: z.string().min(1, 'Date is required'),
-  file: z
-    .instanceof(File, { message: 'File is required' })
-    .refine((f) => ACCEPTED_TYPES.includes(f.type), 'Only PDF, JPG, or PNG files are accepted')
-    .refine((f) => f.size <= MAX_SIZE, 'File must be under 10 MB'),
-  amount: z
-    .number()
-    .min(1, 'Amount is required')
-    .refine(
-      (value) => Number.isInteger(value * 10 ** MAX_DECIMALS),
-      `Amount can have at most ${MAX_DECIMALS} decimals`
-    ),
-  categoryId: z.string().min(1, 'Category is required'),
-})
-
-type ReceiptFormValues = z.infer<typeof receiptSchema>
+import { Controller } from 'react-hook-form'
+import { useAddReceiptModal } from './useAddReceiptModal'
 
 type AddReceiptModalProps = {
   mobile?: boolean
 }
 
-const defaultValues = {
-  place: '',
-  date: dayjs().format('YYYY-MM-DD'),
-  amount: undefined,
-  categoryId: '',
-}
-
 export function AddReceiptModal({ mobile = false }: AddReceiptModalProps) {
-  const [open, setOpen] = useState(false)
   const {
+    open,
+    setOpen,
+    categorySearchValue,
+    setCategorySearchValue,
+    workspaceId,
     register,
     handleSubmit,
     control,
-    reset,
-    formState: { errors, isSubmitting },
-  } = useForm<ReceiptFormValues>({
-    resolver: zodResolver(receiptSchema),
-    defaultValues,
-  })
-
-  function handleOpenChange(nextOpen: boolean) {
-    if (!nextOpen) {
-      reset(defaultValues)
-    }
-    setOpen(nextOpen)
-  }
-
-  function onSubmit(data: ReceiptFormValues) {
-    console.log('Receipt submitted:', data)
-    handleOpenChange(false)
-  }
-
-  function handleClose() {
-    handleOpenChange(false)
-  }
+    errors,
+    isSubmitting,
+    filteredCategoryOptions,
+    handleOpenChange,
+    onSubmit,
+    handleClose,
+  } = useAddReceiptModal()
 
   return (
     <>
@@ -89,12 +44,13 @@ export function AddReceiptModal({ mobile = false }: AddReceiptModalProps) {
           variant="default"
           className="rounded-full shadow-lg"
           onClick={() => setOpen(true)}
+          disabled={!workspaceId}
         >
           <Receipt className="h-5 w-5" />
           Add Receipt
         </Button>
       ) : (
-        <Button variant="default" onClick={() => setOpen(true)}>
+        <Button variant="default" onClick={() => setOpen(true)} disabled={!workspaceId}>
           <Receipt className="h-4 w-4" />
           Add Receipt
         </Button>
@@ -154,13 +110,17 @@ export function AddReceiptModal({ mobile = false }: AddReceiptModalProps) {
               name="categoryId"
               control={control}
               render={({ field: { onChange, value } }) => (
-                <SelectField
+                <SearchableSelectField
                   id="categoryId"
                   label="Category"
+                  searchPlaceholder="Search categories..."
+                  noOptionsText="No categories found."
                   error={errors.categoryId?.message}
-                  options={categories.map((c) => ({ value: c.id, label: c.name }))}
+                  options={filteredCategoryOptions}
                   value={value}
                   onValueChange={onChange}
+                  searchValue={categorySearchValue}
+                  onSearchValueChange={setCategorySearchValue}
                 />
               )}
             />

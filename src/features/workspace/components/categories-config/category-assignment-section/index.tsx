@@ -4,7 +4,6 @@ import type {
   UserWorkspaceResponse,
 } from '@/common/api/_base/api-types.schemas'
 import { Button } from '@/common/components/_base/button'
-import { Input } from '@/common/components/_base/input'
 import {
   Select,
   SelectItem,
@@ -160,10 +159,16 @@ export function CategoryAssignmentSection({
             </SelectTrigger>
             <SelectPopup>
               <div className="px-2 pb-2">
-                <Input
+                <input
+                  autoFocus
+                  type="text"
                   value={searchValue}
                   onChange={(event) => setSearchValue(event.target.value)}
-                  placeholder="Search users..."
+                  onKeyDownCapture={(event) => event.stopPropagation()}
+                  onKeyDown={(event) => event.stopPropagation()}
+                  onKeyUpCapture={(event) => event.stopPropagation()}
+                  placeholder="Search categories..."
+                  className="h-10 w-full min-w-0 rounded-none border-0 border-b-2 border-accent bg-transparent px-2.5 py-1 text-base text-foreground caret-foreground outline-none placeholder:text-muted-foreground md:text-sm"
                 />
               </div>
               <SelectList>

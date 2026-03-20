@@ -1865,6 +1865,10 @@
                 ]
               }
             }
+          },
+          "searchValue": {
+            "type": "string",
+            "minLength": 1
           }
         }
       },

@@ -10,6 +10,7 @@ import { QUERY_KEY } from '@/common/constants/query-key.constant'
 import { infiniteQueryOptions, queryOptions } from '@tanstack/react-query'
 
 const CATEGORIES_PAGE_LIMIT = 20
+const SEARCH_CATEGORIES_LIMIT = 5
 
 export const categoryQueryOptions = {
   getCategoryById: (workspaceId: string, categoryId: string) =>
@@ -77,6 +78,29 @@ export const categoryQueryOptions = {
 
         return lastPageParam + 1
       },
+    }),
+  getMyCategories: (workspaceId: string, searchValue = '') =>
+    queryOptions({
+      queryKey: [QUERY_KEY.CATEGORY, 'my-categories', workspaceId, searchValue],
+      queryFn: async () => {
+        const response = await categoryControllerGetMyCategories(
+          {
+            'workspace-id': workspaceId,
+          },
+          {
+            page: 1,
+            limit: SEARCH_CATEGORIES_LIMIT,
+            searchValue: searchValue?.length && searchValue.length > 0 ? searchValue : undefined,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem(LOCAL_STORAGE_KEYS.TOKEN)}`,
+            },
+          }
+        )
+        return response
+      },
+      enabled: Boolean(workspaceId),
     }),
   getWorkspaceInfiniteCategories: (workspaceId: string) =>
     infiniteQueryOptions({

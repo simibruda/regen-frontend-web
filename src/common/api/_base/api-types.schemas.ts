@@ -161,6 +161,8 @@ export interface GetMyCategoriesRequest {
   sortBy?: string
   sortOrder?: GetMyCategoriesRequestSortOrder
   where?: GetMyCategoriesRequestWhere
+  /** @minLength 1 */
+  searchValue?: string
 }
 
 export type GetCategoriesResponseAssignedUsersItem = {
