@@ -13,10 +13,15 @@ import {
   SidebarMenuItem,
 } from '@/common/components/_base/sidebar'
 import { managerNavigation } from '@/common/config/navigation'
+import { LOCAL_STORAGE_KEYS } from '@/common/constants/local-storage.constants'
 
 export function AppSidebar() {
   const router = useRouterState()
   const currentPath = router.location.pathname
+
+  function handleLogout() {
+    localStorage.removeItem(LOCAL_STORAGE_KEYS.TOKEN)
+  }
 
   return (
     <Sidebar>
@@ -58,6 +63,7 @@ export function AppSidebar() {
             <SidebarMenuButton
               tooltip="Logout"
               render={<Link to="/login" />}
+              onClick={handleLogout}
             >
               <LogOut />
               <span>Logout</span>
