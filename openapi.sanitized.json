@@ -207,9 +207,46 @@
         "requestBody": {
           "required": true,
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/RegisterRequest"
+                "type": "object",
+                "required": [
+                  "email",
+                  "password",
+                  "firstName",
+                  "lastName"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "example": "john.doe@example.com"
+                  },
+                  "password": {
+                    "type": "string",
+                    "example": "secret123"
+                  },
+                  "firstName": {
+                    "type": "string",
+                    "example": "John"
+                  },
+                  "lastName": {
+                    "type": "string",
+                    "example": "Doe"
+                  },
+                  "workspaceId": {
+                    "type": "string",
+                    "example": "cm8exampleworkspaceid"
+                  },
+                  "workspaceName": {
+                    "type": "string",
+                    "example": "Acme Workspace"
+                  },
+                  "avatar": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Optional avatar image (jpg, jpeg, png, webp)"
+                  }
+                }
               }
             }
           }
@@ -992,6 +1029,42 @@
           "Receipt"
         ]
       }
+    },
+    "/workspace/{workspaceId}": {
+      "get": {
+        "description": "Public endpoint that returns a single workspace by id.",
+        "operationId": "WorkspaceController_getWorkspaceById",
+        "parameters": [
+          {
+            "name": "workspaceId",
+            "required": true,
+            "in": "path",
+            "description": "Workspace ID",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Workspace retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspacePublicResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Workspace not found"
+          }
+        },
+        "summary": "Get workspace by id",
+        "tags": [
+          "Workspace"
+        ]
+      }
     }
   },
   "info": {
@@ -1119,47 +1192,6 @@
         },
         "required": [
           "jwt"
-        ]
-      },
-      "RegisterRequest": {
-        "type": "object",
-        "properties": {
-          "email": {
-            "type": "string",
-            "format": "email",
-            "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
-          },
-          "password": {
-            "type": "string",
-            "minLength": 6
-          },
-          "firstName": {
-            "type": "string",
-            "minLength": 1
-          },
-          "lastName": {
-            "type": "string",
-            "minLength": 1
-          },
-          "workspaceId": {
-            "type": "string",
-            "minLength": 1
-          },
-          "workspaceName": {
-            "type": "string",
-            "minLength": 1
-          },
-          "avatar": {
-            "type": "string",
-            "nullable": true
-          }
-        },
-        "required": [
-          "email",
-          "password",
-          "firstName",
-          "lastName",
-          "avatar"
         ]
       },
       "GetUsersByWorkspaceRequest": {
@@ -2520,6 +2552,21 @@
           "userId",
           "createdAt",
           "updatedAt"
+        ]
+      },
+      "WorkspacePublicResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
         ]
       }
     }

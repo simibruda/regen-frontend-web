@@ -7,11 +7,11 @@
  */
 import type {
   AuthControllerGetCurrentWorkspaceHeaders,
+  AuthControllerRegisterBody,
   CurrentUserResponse,
   CurrentWorkspaceResponse,
   LoginRequest,
   LoginResponse,
-  RegisterRequest,
 } from './api-types.schemas'
 
 import { customInstance } from '../../../lib/axios'
@@ -63,16 +63,26 @@ export const authControllerLogin = (
  * @summary User Registration
  */
 export const authControllerRegister = (
-  registerRequest: RegisterRequest,
+  authControllerRegisterBody: AuthControllerRegisterBody,
   options?: SecondParameter<typeof customInstance<LoginResponse>>
 ) => {
+  const formData = new FormData()
+  formData.append(`email`, authControllerRegisterBody.email)
+  formData.append(`password`, authControllerRegisterBody.password)
+  formData.append(`firstName`, authControllerRegisterBody.firstName)
+  formData.append(`lastName`, authControllerRegisterBody.lastName)
+  if (authControllerRegisterBody.workspaceId !== undefined) {
+    formData.append(`workspaceId`, authControllerRegisterBody.workspaceId)
+  }
+  if (authControllerRegisterBody.workspaceName !== undefined) {
+    formData.append(`workspaceName`, authControllerRegisterBody.workspaceName)
+  }
+  if (authControllerRegisterBody.avatar !== undefined) {
+    formData.append(`avatar`, authControllerRegisterBody.avatar)
+  }
+
   return customInstance<LoginResponse>(
-    {
-      url: `/auth/register`,
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      data: registerRequest,
-    },
+    { url: `/auth/register`, method: 'POST', data: formData },
     options
   )
 }

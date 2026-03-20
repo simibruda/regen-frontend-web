@@ -1,38 +1,84 @@
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
-import { Link } from '@tanstack/react-router'
-import { toast } from 'sonner'
+import { apiOptions } from '@/common/api'
 import { Button } from '@/common/components/_base/button'
+import { Dropzone } from '@/common/components/_base/dropzone'
 import { InputField } from '@/common/components/_base/input-field'
+import { LOCAL_STORAGE_KEYS } from '@/common/constants/local-storage.constants'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useMutation, useQuery } from '@tanstack/react-query'
+import { Link, useNavigate, useSearch } from '@tanstack/react-router'
+import { useMemo } from 'react'
+import { Controller, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import { z } from 'zod'
 
-const registerSchema = z
-  .object({
-    firstName: z.string().min(1, 'First name is required'),
-    lastName: z.string().min(1, 'Last name is required'),
-    email: z.string().min(1, 'Email is required').email('Invalid email address'),
-    password: z.string().min(6, 'Password must be at least 6 characters'),
-    confirmPassword: z.string().min(1, 'Please confirm your password'),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: 'Passwords do not match',
-    path: ['confirmPassword'],
-  })
+const createRegisterSchema = (hasWorkspaceId: boolean) =>
+  z
+    .object({
+      firstName: z.string().min(1, 'First name is required'),
+      lastName: z.string().min(1, 'Last name is required'),
+      email: z.string().min(1, 'Email is required').email('Invalid email address'),
+      password: z.string().min(6, 'Password must be at least 6 characters'),
+      confirmPassword: z.string().min(1, 'Please confirm your password'),
+      workspaceName: z.string().optional(),
+      avatar: z.instanceof(File).optional(),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+      message: 'Passwords do not match',
+      path: ['confirmPassword'],
+    })
+    .superRefine((data, ctx) => {
+      if (!hasWorkspaceId && (!data.workspaceName || data.workspaceName.trim().length === 0)) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: 'Workspace name is required',
+          path: ['workspaceName'],
+        })
+      }
+    })
 
-type RegisterFormValues = z.infer<typeof registerSchema>
+type RegisterFormValues = z.infer<ReturnType<typeof createRegisterSchema>>
 
 export function RegisterPage() {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<RegisterFormValues>({
-    resolver: zodResolver(registerSchema),
+  const { workspaceId } = useSearch({ from: '/register' })
+  const navigate = useNavigate()
+
+  const { mutateAsync: registerMutation } = useMutation({
+    ...apiOptions.mutations.register,
   })
 
-  function onSubmit(data: RegisterFormValues) {
-    console.log('Register submitted:', data)
-    toast.success('Account created successfully!')
+  const registerSchema = useMemo(() => createRegisterSchema(Boolean(workspaceId)), [workspaceId])
+
+  const { data: workspace } = useQuery({
+    ...apiOptions.queries.getWorkspaceById(workspaceId ?? ''),
+    enabled: Boolean(workspaceId),
+  })
+
+  const {
+    control,
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting ,isValid},
+  } = useForm<RegisterFormValues>({
+    resolver: zodResolver(registerSchema),
+    mode: 'onChange',
+  })
+
+  async function onSubmit(data: RegisterFormValues) {
+    try {
+      const response = await registerMutation({
+        ...data,
+        workspaceId,
+        workspaceName: workspaceId ? undefined : data.workspaceName,
+        avatar: data.avatar,
+      })
+
+      localStorage.setItem(LOCAL_STORAGE_KEYS.TOKEN, response.jwt)
+
+      navigate({ to: '/' })
+    } catch (error) {
+      console.error(error)
+      toast.error('Failed to register')
+    }
   }
 
   return (
@@ -50,15 +96,26 @@ export function RegisterPage() {
               <span className="font-bold">Re</span>
               <span className="font-normal">Manage</span>
             </p>
-            <h1 className="text-xl font-medium tracking-tight text-primary">
-              Register
-            </h1>
-            <p className="text-xs text-black/50">
-              Create your account to get started.
-            </p>
+            <h1 className="text-xl font-medium tracking-tight text-primary">Register</h1>
+            <p className="text-xs text-black/50">Create your account to get started.</p>
+            {workspace?.name && (
+              <p className="rounded-md bg-accent/10 px-3 py-2 text-sm text-primary">
+                Hello! You will be joining the workspace {workspace.name}.
+              </p>
+            )}
           </header>
 
-          <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
+          <form className="space-y-1" onSubmit={handleSubmit(onSubmit)}>
+            {!workspaceId && (
+              <InputField
+                id="workspaceName"
+                type="text"
+                label="Workspace Name"
+                error={errors.workspaceName?.message}
+                {...register('workspaceName')}
+              />
+            )}
+
             <InputField
               id="firstName"
               type="text"
@@ -99,6 +156,22 @@ export function RegisterPage() {
               {...register('confirmPassword')}
             />
 
+            <Controller
+              control={control}
+              name="avatar"
+              render={({ field }) => (
+                <Dropzone
+                  label="Avatar"
+                  value={field.value}
+                  onChange={field.onChange}
+                  error={errors.avatar?.message}
+                  acceptedTypes={['image/jpeg', 'image/jpg', 'image/png', 'image/webp']}
+                  accept=".jpg,.jpeg,.png,.webp"
+                  description="JPG, PNG, or WEBP"
+                />
+              )}
+            />
+
             <p className="text-center text-sm text-black/70">
               Already have an account?{' '}
               <Link to="/login" className="font-medium text-primary hover:underline">
@@ -106,12 +179,7 @@ export function RegisterPage() {
               </Link>
             </p>
 
-            <Button
-              type="submit"
-              variant="default"
-              className="mt-2 w-full"
-              disabled={isSubmitting}
-            >
+            <Button type="submit" variant="default" className="mt-2 w-full" disabled={isSubmitting || !isValid}>
               {isSubmitting ? 'Registering...' : 'Register'}
             </Button>
           </form>

@@ -1,11 +1,11 @@
 import { authControllerLogin } from "@/common/api/_base/auth"
-import type { LoginRequest, RegisterRequest } from "@/common/api/_base/api-types.schemas"
+import type { LoginRequest, AuthControllerRegisterBody } from "@/common/api/_base/api-types.schemas"
 import { authControllerRegister } from "@/common/api/_base/auth"
 import { mutationOptions } from "@tanstack/react-query"
 
 export const authMutationOptions = {
   register: mutationOptions({
-    mutationFn: async (request: RegisterRequest) => {
+    mutationFn: async (request: AuthControllerRegisterBody) => {
       try {
         const response = await authControllerRegister(request)
         localStorage.setItem('token', response.jwt)

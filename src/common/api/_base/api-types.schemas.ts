@@ -49,23 +49,6 @@ export interface LoginResponse {
   jwt: string
 }
 
-export interface RegisterRequest {
-  /** @pattern ^(?!\.)(?!.*\.\.)([A-Za-z0-9_'+\-\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$ */
-  email: string
-  /** @minLength 6 */
-  password: string
-  /** @minLength 1 */
-  firstName: string
-  /** @minLength 1 */
-  lastName: string
-  /** @minLength 1 */
-  workspaceId?: string
-  /** @minLength 1 */
-  workspaceName?: string
-  /** @nullable */
-  avatar: string | null
-}
-
 export type GetUsersByWorkspaceRequestSortOrder =
   (typeof GetUsersByWorkspaceRequestSortOrder)[keyof typeof GetUsersByWorkspaceRequestSortOrder]
 
@@ -525,6 +508,11 @@ export interface ReceiptWorkspaceResponse {
   updatedAt: string
 }
 
+export interface WorkspacePublicResponse {
+  id: string
+  name: string
+}
+
 export type HealthCheckControllerGetHealth200Status =
   (typeof HealthCheckControllerGetHealth200Status)[keyof typeof HealthCheckControllerGetHealth200Status]
 
@@ -583,6 +571,17 @@ export type AuthControllerGetCurrentWorkspaceHeaders = {
    * Workspace ID associated with the authenticated user
    */
   'workspace-id': string
+}
+
+export type AuthControllerRegisterBody = {
+  email: string
+  password: string
+  firstName: string
+  lastName: string
+  workspaceId?: string
+  workspaceName?: string
+  /** Optional avatar image (jpg, jpeg, png, webp) */
+  avatar?: Blob
 }
 
 export type UserControllerGetWorkspaceUsersHeaders = {
