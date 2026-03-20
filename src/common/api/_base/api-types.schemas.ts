@@ -161,14 +161,61 @@ export interface GetMyCategoriesRequest {
   where?: GetMyCategoriesRequestWhere
 }
 
+export type GetCategoriesResponseAssignedUsersItem = {
+  id: string
+  firstName: string
+  lastName: string
+  /** @nullable */
+  avatar?: string | null
+}
+
 export interface GetCategoriesResponse {
   id: string
   name: string
   workspaceId: string
+  assignedUsers: GetCategoriesResponseAssignedUsersItem[]
+  /**
+   * @minimum 0
+   * @maximum 9007199254740991
+   */
+  assignedUsersCount: number
   /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
   createdAt: string
   /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
   updatedAt: string
+}
+
+export type GetWorkspaceCategoriesRequestSortOrder =
+  (typeof GetWorkspaceCategoriesRequestSortOrder)[keyof typeof GetWorkspaceCategoriesRequestSortOrder]
+
+export const GetWorkspaceCategoriesRequestSortOrder = {
+  asc: 'asc',
+  desc: 'desc',
+} as const
+
+export type GetWorkspaceCategoriesRequestWhereName =
+  | { [key: string]: string }
+  | { [key: string]: number }
+  | { [key: string]: boolean }
+
+export type GetWorkspaceCategoriesRequestWhere = {
+  name?: GetWorkspaceCategoriesRequestWhereName
+}
+
+export interface GetWorkspaceCategoriesRequest {
+  /**
+   * @minimum 1
+   * @maximum 9007199254740991
+   */
+  page?: number
+  /**
+   * @minimum 1
+   * @maximum 20
+   */
+  limit?: number
+  sortBy?: string
+  sortOrder?: GetWorkspaceCategoriesRequestSortOrder
+  where?: GetWorkspaceCategoriesRequestWhere
 }
 
 export interface CreateCategoryRequest {
@@ -599,6 +646,13 @@ export type UserControllerDeleteUserHeaders = {
 }
 
 export type CategoryControllerGetMyCategoriesHeaders = {
+  /**
+   * Workspace ID associated with the authenticated user
+   */
+  'workspace-id': string
+}
+
+export type CategoryControllerGetWorkspaceCategoriesHeaders = {
   /**
    * Workspace ID associated with the authenticated user
    */

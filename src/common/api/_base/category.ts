@@ -8,9 +8,11 @@
 import type {
   CategoryControllerCreateCategoryHeaders,
   CategoryControllerGetMyCategoriesHeaders,
+  CategoryControllerGetWorkspaceCategoriesHeaders,
   CreateCategoryRequest,
   GetCategoriesResponse,
   GetMyCategoriesRequest,
+  GetWorkspaceCategoriesRequest,
   MutationResponse,
 } from './api-types.schemas'
 
@@ -38,6 +40,25 @@ export const categoryControllerGetMyCategories = (
   )
 }
 /**
+ * Retrieve categories from the authenticated workspace with optional filters, sorting, and pagination. Admin role required.
+ * @summary Get workspace categories
+ */
+export const categoryControllerGetWorkspaceCategories = (
+  headers: CategoryControllerGetWorkspaceCategoriesHeaders,
+  getWorkspaceCategoriesRequest?: GetWorkspaceCategoriesRequest,
+  options?: SecondParameter<typeof customInstance<GetCategoriesResponse[]>>
+) => {
+  return customInstance<GetCategoriesResponse[]>(
+    {
+      url: `/workspace/category/workspace`,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...headers },
+      data: getWorkspaceCategoriesRequest,
+    },
+    options
+  )
+}
+/**
  * Create a new category in the authenticated workspace. Accessible only by manager users.
  * @summary Create category
  */
@@ -58,6 +79,9 @@ export const categoryControllerCreateCategory = (
 }
 export type CategoryControllerGetMyCategoriesResult = NonNullable<
   Awaited<ReturnType<typeof categoryControllerGetMyCategories>>
+>
+export type CategoryControllerGetWorkspaceCategoriesResult = NonNullable<
+  Awaited<ReturnType<typeof categoryControllerGetWorkspaceCategories>>
 >
 export type CategoryControllerCreateCategoryResult = NonNullable<
   Awaited<ReturnType<typeof categoryControllerCreateCategory>>

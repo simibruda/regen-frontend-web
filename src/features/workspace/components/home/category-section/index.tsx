@@ -1,14 +1,16 @@
 import { LayoutGrid } from 'lucide-react'
-import { categories } from '@/common/mocks/categories'
+import type { Category } from '@/common/mocks/categories'
 import { CategoryCard } from '../category-card'
 import { AddReceiptModalTrigger } from '../add-receipt-modal-trigger'
 import { AddRouteModalTrigger } from '../add-route-modal-trigger'
 
-const totalPeople = new Set(
-  categories.flatMap((c) => c.assignedPeople.map((p) => p.id)),
-).size
+type CategorySectionProps = {
+  categories: Category[]
+}
 
-export function CategorySection() {
+export function  CategorySection({ categories }: CategorySectionProps) {
+  const totalPeople = new Set(categories.flatMap((c) => c.assignedPeople.map((p) => p.id))).size
+
   return (
     <>
       <div className="mx-auto max-w-5xl">

@@ -453,6 +453,67 @@
         ]
       }
     },
+    "/workspace/category/workspace": {
+      "post": {
+        "description": "Retrieve categories from the authenticated workspace with optional filters, sorting, and pagination. Admin role required.",
+        "operationId": "CategoryController_getWorkspaceCategories",
+        "parameters": [
+          {
+            "name": "workspace-id",
+            "in": "header",
+            "description": "Workspace ID associated with the authenticated user",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "description": "Optional query params payload for filtering and pagination",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetWorkspaceCategoriesRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Workspace categories retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GetCategoriesResponse"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing or invalid workspace header"
+          },
+          "401": {
+            "description": "Missing or invalid JWT token"
+          },
+          "403": {
+            "description": "Admin access required"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Get workspace categories",
+        "tags": [
+          "Category"
+        ]
+      }
+    },
     "/workspace/category/create": {
       "post": {
         "description": "Create a new category in the authenticated workspace. Accessible only by manager users.",
@@ -1493,6 +1554,37 @@
           "workspaceId": {
             "type": "string"
           },
+          "assignedUsers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "firstName": {
+                  "type": "string"
+                },
+                "lastName": {
+                  "type": "string"
+                },
+                "avatar": {
+                  "type": "string",
+                  "nullable": true
+                }
+              },
+              "required": [
+                "id",
+                "firstName",
+                "lastName"
+              ]
+            }
+          },
+          "assignedUsersCount": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
           "createdAt": {
             "type": "string",
             "format": "date-time",
@@ -1508,9 +1600,76 @@
           "id",
           "name",
           "workspaceId",
+          "assignedUsers",
+          "assignedUsersCount",
           "createdAt",
           "updatedAt"
         ]
+      },
+      "GetWorkspaceCategoriesRequest": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "default": 1,
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
+          "limit": {
+            "default": 20,
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 20
+          },
+          "sortBy": {
+            "default": "createdAt",
+            "type": "string"
+          },
+          "sortOrder": {
+            "default": "asc",
+            "type": "string",
+            "enum": [
+              "asc",
+              "desc"
+            ]
+          },
+          "where": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "number"
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string",
+                      "format": "date-time",
+                      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+                    }
+                  },
+                  {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "boolean"
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
       },
       "CreateCategoryRequest": {
         "type": "object",
