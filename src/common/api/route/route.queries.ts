@@ -14,15 +14,7 @@ export const routeQueryOptions = {
     userIds?: string[]
   ) =>
     queryOptions({
-      queryKey: [
-        QUERY_KEY.ROUTE,
-        'workspace',
-        workspaceId,
-        userIds?.join(',') ?? 'all',
-        startDate,
-        endDate,
-        page,
-      ],
+      queryKey: [QUERY_KEY.ROUTE, 'workspace', workspaceId, userIds?.join(',') ?? 'all', startDate, endDate, page],
       queryFn: async () => {
         const response = await routeControllerGetWorkspaceRoutes(
           { 'workspace-id': workspaceId },
@@ -32,8 +24,6 @@ export const routeQueryOptions = {
             where: {
               date: {
                 gte: startDate,
-              },
-              date: {
                 lte: endDate,
               },
             },
