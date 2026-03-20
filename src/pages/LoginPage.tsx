@@ -1,10 +1,12 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
 import { Button } from '@/common/components/_base/button'
 import { InputField } from '@/common/components/_base/input-field'
+import { useMutation } from '@tanstack/react-query'
+import { apiOptions } from '@/common/api'
 
 const loginSchema = z.object({
   email: z.string().min(1, 'Email is required').email('Invalid email address'),
@@ -14,6 +16,12 @@ const loginSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>
 
 export function LoginPage() {
+  const navigate = useNavigate()
+
+  const { mutateAsync: loginMutation } = useMutation({
+    ...apiOptions.mutations.login,
+  })
+
   const {
     register,
     handleSubmit,
@@ -22,9 +30,15 @@ export function LoginPage() {
     resolver: zodResolver(loginSchema),
   })
 
-  function onSubmit(data: LoginFormValues) {
-    console.log('Login submitted:', data)
-    toast.success('Login successful!')
+  async function onSubmit(data: LoginFormValues) {
+    try {
+      await loginMutation(data)
+      toast.success('Login successful!')
+      navigate({ to: '/' })
+    } catch (error) {
+      console.error(error)
+      toast.error('Failed to login')
+    }
   }
 
   return (
