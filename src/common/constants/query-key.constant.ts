@@ -3,4 +3,7 @@ export const QUERY_KEY = {
   CATEGORY: 'category',
   USER: 'user',
   WORKSPACE: 'workspace',
+  RECEIPT: 'receipt',
+  ROUTE: 'route',
+  CAR: 'car',
 }

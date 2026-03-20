@@ -9,10 +9,15 @@ import type {
   AssignUsersToCategoryRequest,
   CategoryControllerAssignUsersToCategoryHeaders,
   CategoryControllerCreateCategoryHeaders,
+  CategoryControllerGetCategoryByIdHeaders,
+  CategoryControllerGetCategoryStatsHeaders,
   CategoryControllerGetMyCategoriesHeaders,
   CategoryControllerGetWorkspaceCategoriesHeaders,
+  CategoryStatsResponse,
   CreateCategoryRequest,
   GetCategoriesResponse,
+  GetCategoryByIdResponse,
+  GetCategoryStatsRequest,
   GetMyCategoriesRequest,
   GetWorkspaceCategoriesRequest,
   MutationResponse,
@@ -81,6 +86,40 @@ export const categoryControllerAssignUsersToCategory = (
   )
 }
 /**
+ * Retrieve receipt and route statistics for a category in a given date range.
+ * @summary Get category stats
+ */
+export const categoryControllerGetCategoryStats = (
+  categoryId: string,
+  getCategoryStatsRequest: GetCategoryStatsRequest,
+  headers: CategoryControllerGetCategoryStatsHeaders,
+  options?: SecondParameter<typeof customInstance<CategoryStatsResponse>>
+) => {
+  return customInstance<CategoryStatsResponse>(
+    {
+      url: `/category/${categoryId}/stats`,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...headers },
+      data: getCategoryStatsRequest,
+    },
+    options
+  )
+}
+/**
+ * Retrieve a single category by id from the authenticated workspace.
+ * @summary Get category by id
+ */
+export const categoryControllerGetCategoryById = (
+  categoryId: string,
+  headers: CategoryControllerGetCategoryByIdHeaders,
+  options?: SecondParameter<typeof customInstance<GetCategoryByIdResponse>>
+) => {
+  return customInstance<GetCategoryByIdResponse>(
+    { url: `/category/${categoryId}`, method: 'GET', headers },
+    options
+  )
+}
+/**
  * Create a new category in the authenticated workspace. Accessible only by manager users.
  * @summary Create category
  */
@@ -107,6 +146,12 @@ export type CategoryControllerGetWorkspaceCategoriesResult = NonNullable<
 >
 export type CategoryControllerAssignUsersToCategoryResult = NonNullable<
   Awaited<ReturnType<typeof categoryControllerAssignUsersToCategory>>
+>
+export type CategoryControllerGetCategoryStatsResult = NonNullable<
+  Awaited<ReturnType<typeof categoryControllerGetCategoryStats>>
+>
+export type CategoryControllerGetCategoryByIdResult = NonNullable<
+  Awaited<ReturnType<typeof categoryControllerGetCategoryById>>
 >
 export type CategoryControllerCreateCategoryResult = NonNullable<
   Awaited<ReturnType<typeof categoryControllerCreateCategory>>

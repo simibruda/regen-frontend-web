@@ -1,47 +1,74 @@
+import { apiOptions } from '@/common/api'
+import { RECEIPTS_PAGE_LIMIT } from '@/common/api/receipt/receipt.queries'
+import type { ReceiptWorkspaceResponse } from '@/common/api/_base/api-types.schemas'
 import { Button } from '@/common/components/_base/button'
-import type { WorkspaceReceipt } from '@/common/mocks/receipts'
+import { Loader } from '@/common/components/_base/loader'
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/common/components/_base/pagination'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useParams } from '@tanstack/react-router'
 import { getCoreRowModel, useReactTable, type ColumnDef } from '@tanstack/react-table'
 import dayjs from 'dayjs'
 import { Download, FileText } from 'lucide-react'
-import { useCallback, useMemo } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { SharedDataTable } from '../shared-data-table'
 
 type ReceiptsTableSectionProps = {
-  receipts: WorkspaceReceipt[]
-  categoryName?: string
+  startDate: string
+  endDate: string
 }
 
-export function ReceiptsTableSection({ receipts, categoryName }: ReceiptsTableSectionProps) {
+export function ReceiptsTableSection({
+  startDate,
+  endDate,
+}: ReceiptsTableSectionProps) {
+  const { id: categoryId } = useParams({ from: '/_auth-guard/category/$id' })
+  const { data: currentUser } = useQuery({
+    ...apiOptions.queries.getCurrentUser,
+  })
+  const workspaceId = currentUser?.workspaceId ?? ''
+  const enabled = Boolean(workspaceId && categoryId)
+
+  const [currentPage, setCurrentPage] = useState(1)
+  const queryClient = useQueryClient()
+  const { data: receipts = [], isLoading } = useQuery({
+    ...apiOptions.queries.getWorkspaceReceipts(
+      workspaceId,
+      startDate,
+      endDate,
+      currentPage,
+      categoryId
+    ),
+    enabled,
+  })
+  const hasNextPage = receipts.length === RECEIPTS_PAGE_LIMIT
+
   const handleDownloadReceipt = useCallback(
-    (receiptId: string) => {
-      const receipt = receipts.find((item) => item.id === receiptId)
-      if (!receipt) return
+    async (receiptId: string) => {
+      if (!workspaceId) return
 
-      const mockFileContent = [
-        `Receipt: ${receipt.name}`,
-        `User: ${receipt.userFirstName} ${receipt.userLastName}`,
-        `Amount: ${formatCurrency(receipt.amount)}`,
-        `Date: ${dayjs(receipt.date).format('DD.MM.YYYY')}`,
-        `Category: ${categoryName ?? '-'}`,
-        `File: ${receipt.fileName}`,
-      ].join('\n')
+      const response = await queryClient.fetchQuery(
+        apiOptions.queries.getReceiptBlob(workspaceId, receiptId)
+      )
 
-      const blob = new Blob([mockFileContent], { type: 'text/plain;charset=utf-8' })
-      const url = URL.createObjectURL(blob)
       const link = document.createElement('a')
-      link.href = url
-      link.download = receipt.fileName.replace(/\.(pdf|jpg|jpeg|png)$/i, '.txt')
+      link.href = response.blobUrl
+      link.target = '_blank'
+      link.rel = 'noopener noreferrer'
       link.click()
-      URL.revokeObjectURL(url)
     },
-    [categoryName, receipts],
+    [queryClient, workspaceId],
   )
 
-  const receiptColumns = useMemo<ColumnDef<WorkspaceReceipt>[]>(
+  const receiptColumns = useMemo<ColumnDef<ReceiptWorkspaceResponse>[]>(
     () => [
-      { header: 'Name', accessorKey: 'name' },
-      { header: 'First Name', accessorKey: 'userFirstName' },
-      { header: 'Last Name', accessorKey: 'userLastName' },
+      { header: 'Place', accessorKey: 'place' },
       {
         header: 'Amount',
         accessorKey: 'amount',
@@ -60,7 +87,7 @@ export function ReceiptsTableSection({ receipts, categoryName }: ReceiptsTableSe
             size="sm"
             variant="outline"
             className="border-border text-foreground hover:bg-secondary"
-            onClick={() => handleDownloadReceipt(row.original.id)}
+            onClick={() => void handleDownloadReceipt(row.original.id)}
           >
             <Download className="h-4 w-4" />
             Download
@@ -84,11 +111,50 @@ export function ReceiptsTableSection({ receipts, categoryName }: ReceiptsTableSe
         <h2 className="text-lg font-semibold text-foreground">Receipts</h2>
       </div>
       <p className="mt-0.5 pl-7 text-sm text-muted-foreground">
-        Includes name, user, amount, date, and file download action.
+        Includes place, amount, date, and file download action.
       </p>
-      <div className="mt-4 overflow-x-auto">
-        <SharedDataTable table={receiptTable} emptyMessage="No receipts for selected date range." />
-      </div>
+      {isLoading ? (
+        <div className="mt-8">
+          <Loader />
+        </div>
+      ) : (
+        <div className="mt-4 space-y-3">
+          <div className="overflow-x-auto">
+            <SharedDataTable table={receiptTable} emptyMessage="No receipts for selected date range." />
+          </div>
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  href="#"
+                  onClick={(event) => {
+                    event.preventDefault()
+                    if (currentPage <= 1) return
+                    setCurrentPage((page) => page - 1)
+                  }}
+                  className={currentPage <= 1 ? 'pointer-events-none opacity-50' : undefined}
+                />
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationLink href="#" isActive onClick={(event) => event.preventDefault()}>
+                  {currentPage}
+                </PaginationLink>
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationNext
+                  href="#"
+                  onClick={(event) => {
+                    event.preventDefault()
+                    if (!hasNextPage) return
+                    setCurrentPage((page) => page + 1)
+                  }}
+                  className={!hasNextPage ? 'pointer-events-none opacity-50' : undefined}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
+      )}
     </section>
   )
 }

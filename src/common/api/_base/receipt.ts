@@ -8,8 +8,10 @@
 import type {
   GetReceiptsByWorkspaceRequest,
   MutationResponse,
+  ReceiptBlobResponse,
   ReceiptControllerAddRecipeBody,
   ReceiptControllerAddRecipeHeaders,
+  ReceiptControllerGetReceiptBlobHeaders,
   ReceiptControllerGetWorkspaceReceiptsHeaders,
   ReceiptWorkspaceResponse,
 } from './api-types.schemas'
@@ -58,9 +60,26 @@ export const receiptControllerGetWorkspaceReceipts = (
     options
   )
 }
+/**
+ * Retrieve the blob URL for a specific receipt in the authenticated workspace.
+ * @summary Get receipt blob
+ */
+export const receiptControllerGetReceiptBlob = (
+  receiptId: string,
+  headers: ReceiptControllerGetReceiptBlobHeaders,
+  options?: SecondParameter<typeof customInstance<ReceiptBlobResponse>>
+) => {
+  return customInstance<ReceiptBlobResponse>(
+    { url: `/workspace/receipt/${receiptId}/blob`, method: 'GET', headers },
+    options
+  )
+}
 export type ReceiptControllerAddRecipeResult = NonNullable<
   Awaited<ReturnType<typeof receiptControllerAddRecipe>>
 >
 export type ReceiptControllerGetWorkspaceReceiptsResult = NonNullable<
   Awaited<ReturnType<typeof receiptControllerGetWorkspaceReceipts>>
+>
+export type ReceiptControllerGetReceiptBlobResult = NonNullable<
+  Awaited<ReturnType<typeof receiptControllerGetReceiptBlob>>
 >

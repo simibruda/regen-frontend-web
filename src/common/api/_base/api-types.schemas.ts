@@ -224,6 +224,60 @@ export interface AssignUsersToCategoryRequest {
   userIds: string[]
 }
 
+export interface GetCategoryStatsRequest {
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
+  startDate: string
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
+  endDate: string
+}
+
+export type CategoryStatsResponseReceiptsByNameItem = {
+  name: string
+  totalAmount: number
+  percentage: number
+}
+
+export interface CategoryStatsResponse {
+  categoryId: string
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
+  startDate: string
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
+  endDate: string
+  totalReceiptAmount: number
+  /**
+   * @minimum 0
+   * @maximum 9007199254740991
+   */
+  totalRoutes: number
+  totalKm: number
+  totalFuel: number
+  receiptsByName: CategoryStatsResponseReceiptsByNameItem[]
+}
+
+export type GetCategoryByIdResponseAssignedUsersItem = {
+  id: string
+  firstName: string
+  lastName: string
+  /** @nullable */
+  avatar?: string | null
+}
+
+export interface GetCategoryByIdResponse {
+  id: string
+  name: string
+  workspaceId: string
+  assignedUsers: GetCategoryByIdResponseAssignedUsersItem[]
+  /**
+   * @minimum 0
+   * @maximum 9007199254740991
+   */
+  assignedUsersCount: number
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
+  createdAt: string
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
+  updatedAt: string
+}
+
 export interface CreateCategoryRequest {
   /** @minLength 1 */
   name: string
@@ -293,6 +347,24 @@ export interface CarWorkspaceResponse {
   createdAt: string
   /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
   updatedAt: string
+}
+
+export interface GetWorkspaceCarsTotalKmRequest {
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
+  startDate: string
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
+  endDate: string
+  /** @minLength 1 */
+  categoryId: string
+}
+
+export interface WorkspaceCarTotalKmResponse {
+  id: string
+  name: string
+  plateNumber: string
+  consumtion: number
+  totalKm: number
+  averageLiterConsumed: number
 }
 
 export interface CreateRouteRequest {
@@ -561,6 +633,11 @@ export interface ReceiptWorkspaceResponse {
   updatedAt: string
 }
 
+export interface ReceiptBlobResponse {
+  receiptId: string
+  blobUrl: string
+}
+
 export interface WorkspacePublicResponse {
   id: string
   name: string
@@ -672,6 +749,20 @@ export type CategoryControllerAssignUsersToCategoryHeaders = {
   'workspace-id': string
 }
 
+export type CategoryControllerGetCategoryStatsHeaders = {
+  /**
+   * Workspace ID associated with the authenticated user
+   */
+  'workspace-id': string
+}
+
+export type CategoryControllerGetCategoryByIdHeaders = {
+  /**
+   * Workspace ID associated with the authenticated user
+   */
+  'workspace-id': string
+}
+
 export type CategoryControllerCreateCategoryHeaders = {
   /**
    * Workspace ID associated with the authenticated user
@@ -687,6 +778,13 @@ export type CarControllerCreateCarHeaders = {
 }
 
 export type CarControllerGetWorkspaceCarsHeaders = {
+  /**
+   * Workspace ID associated with the authenticated user
+   */
+  'workspace-id': string
+}
+
+export type CarControllerGetWorkspaceCarsTotalKmHeaders = {
   /**
    * Workspace ID associated with the authenticated user
    */
@@ -738,6 +836,13 @@ export type ReceiptControllerAddRecipeBody = {
 }
 
 export type ReceiptControllerGetWorkspaceReceiptsHeaders = {
+  /**
+   * Workspace ID associated with the authenticated user
+   */
+  'workspace-id': string
+}
+
+export type ReceiptControllerGetReceiptBlobHeaders = {
   /**
    * Workspace ID associated with the authenticated user
    */

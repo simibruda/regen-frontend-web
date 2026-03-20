@@ -1,6 +1,17 @@
+import { apiOptions } from '@/common/api'
+import { ROUTES_PAGE_LIMIT } from '@/common/api/route/route.queries'
 import { Button } from '@/common/components/_base/button'
-import { cars } from '@/common/mocks/cars'
-import type { WorkspaceRoute } from '@/common/mocks/routes'
+import { Loader } from '@/common/components/_base/loader'
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/common/components/_base/pagination'
+import { useQuery } from '@tanstack/react-query'
+import { useParams } from '@tanstack/react-router'
 import {
   flexRender,
   getCoreRowModel,
@@ -8,6 +19,7 @@ import {
   type ColumnDef,
   type Row,
 } from '@tanstack/react-table'
+import dayjs from 'dayjs'
 import { ArrowRight, ChevronDown, ChevronUp, MapPin } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
@@ -15,37 +27,67 @@ export type RouteTableRow = {
   id: string
   carName: string
   plateNumber: string
-  userFirstName: string
-  userLastName: string
+  userId: string
+  date: string
   startKm: number
-  endKm: number
-  routeKm: number
+  endKm: number | null
+  routeKm: number | null
   stops: { order: number; name: string }[]
 }
 
 type RoutesTableSectionProps = {
-  routes: WorkspaceRoute[]
+  startDate: string
+  endDate: string
 }
 
-export function RoutesTableSection({ routes }: RoutesTableSectionProps) {
+export function RoutesTableSection({
+  startDate,
+  endDate,
+}: RoutesTableSectionProps) {
+  const { id: categoryId } = useParams({ from: '/_auth-guard/category/$id' })
+  const { data: currentUser } = useQuery({
+    ...apiOptions.queries.getCurrentUser,
+  })
+  const workspaceId = currentUser?.workspaceId ?? ''
+  const enabled = Boolean(workspaceId && categoryId)
+
+  const [currentPage, setCurrentPage] = useState(1)
   const [expandedRoutes, setExpandedRoutes] = useState<Record<string, boolean>>({})
+
+  const { data: workspaceRoutes = [], isLoading: isRoutesLoading } = useQuery({
+    ...apiOptions.queries.getWorkspaceRoutes(workspaceId, startDate, endDate, currentPage),
+    enabled,
+  })
+
+  const { data: cars = [], isLoading: isCarsLoading } = useQuery({
+    ...apiOptions.queries.getWorkspaceCarsTotalKm(workspaceId, categoryId, startDate, endDate),
+    enabled,
+  })
+
+  const hasNextPage = workspaceRoutes.length === ROUTES_PAGE_LIMIT
+  const isLoading = isRoutesLoading || isCarsLoading
+
+  const carsById = useMemo(() => new Map(cars.map((car) => [car.id, car])), [cars])
   const routeRows = useMemo<RouteTableRow[]>(
     () =>
-      routes.map((route) => {
-        const car = cars.find((item) => item.id === route.carId)
+      workspaceRoutes.map((route) => {
+        const car = carsById.get(route.carId)
+        const endKm = route.endKm
         return {
           id: route.id,
           carName: car?.name ?? 'Unknown',
           plateNumber: car?.plateNumber ?? 'N/A',
-          userFirstName: route.userFirstName,
-          userLastName: route.userLastName,
+          userId: route.userId,
+          date: route.date,
           startKm: route.startKm,
-          endKm: route.endKm,
-          routeKm: route.endKm - route.startKm,
-          stops: route.stops,
+          endKm,
+          routeKm: endKm === null ? null : endKm - route.startKm,
+          stops: [...route.routeItems]
+            .sort((a, b) => a.order - b.order)
+            .map((item) => ({ order: item.order, name: item.name })),
         }
       }),
-    [routes],
+    [carsById, workspaceRoutes]
   )
 
   const routeColumns = useMemo<ColumnDef<RouteTableRow>[]>(
@@ -72,13 +114,25 @@ export function RoutesTableSection({ routes }: RoutesTableSectionProps) {
       },
       { header: 'Car Name', accessorKey: 'carName' },
       { header: 'Plate Number', accessorKey: 'plateNumber' },
-      { header: 'First Name', accessorKey: 'userFirstName' },
-      { header: 'Last Name', accessorKey: 'userLastName' },
+      { header: 'User ID', accessorKey: 'userId' },
+      {
+        header: 'Date',
+        accessorKey: 'date',
+        cell: ({ row }) => dayjs(row.original.date).format('DD.MM.YYYY'),
+      },
       { header: 'Start KM', accessorKey: 'startKm' },
-      { header: 'End KM', accessorKey: 'endKm' },
-      { header: 'Route KM', accessorKey: 'routeKm' },
+      {
+        header: 'End KM',
+        accessorKey: 'endKm',
+        cell: ({ row }) => (row.original.endKm ?? '-'),
+      },
+      {
+        header: 'Route KM',
+        accessorKey: 'routeKm',
+        cell: ({ row }) => (row.original.routeKm ?? '-'),
+      },
     ],
-    [expandedRoutes],
+    [expandedRoutes]
   )
 
   const routeTable = useReactTable({
@@ -98,41 +152,80 @@ export function RoutesTableSection({ routes }: RoutesTableSectionProps) {
       <p className="mt-0.5 pl-7 text-sm text-muted-foreground">
         Expand a route row to see each stop order and name.
       </p>
-      <div className="mt-4 overflow-x-auto">
-        <table className="min-w-full border-separate border-spacing-0 overflow-hidden rounded-xl border border-border text-sm">
-          <thead className="bg-secondary text-left text-xs uppercase tracking-wide text-muted-foreground">
-            {routeTable.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <th key={header.id} className="border-b border-border px-3 py-2.5 font-semibold">
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(header.column.columnDef.header, header.getContext())}
-                  </th>
+      {isLoading ? (
+        <div className="mt-8">
+          <Loader />
+        </div>
+      ) : (
+        <div className="mt-4 space-y-3">
+          <div className="overflow-x-auto">
+            <table className="min-w-full border-separate border-spacing-0 overflow-hidden rounded-xl border border-border text-sm">
+              <thead className="bg-secondary text-left text-xs uppercase tracking-wide text-muted-foreground">
+                {routeTable.getHeaderGroups().map((headerGroup) => (
+                  <tr key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <th key={header.id} className="border-b border-border px-3 py-2.5 font-semibold">
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(header.column.columnDef.header, header.getContext())}
+                      </th>
+                    ))}
+                  </tr>
                 ))}
-              </tr>
-            ))}
-          </thead>
-          <tbody>
-            {routeTable.getRowModel().rows.length === 0 ? (
-              <tr>
-                <td colSpan={columnCount} className="px-3 py-8 text-center text-muted-foreground">
-                  No routes for selected date range.
-                </td>
-              </tr>
-            ) : (
-              routeTable.getRowModel().rows.map((row) => (
-                <ExpandableRouteRow
-                  key={row.id}
-                  row={row}
-                  isExpanded={!!expandedRoutes[row.original.id]}
-                  columnCount={columnCount}
+              </thead>
+              <tbody>
+                {routeTable.getRowModel().rows.length === 0 ? (
+                  <tr>
+                    <td colSpan={columnCount} className="px-3 py-8 text-center text-muted-foreground">
+                      No routes for selected date range.
+                    </td>
+                  </tr>
+                ) : (
+                  routeTable.getRowModel().rows.map((row) => (
+                    <ExpandableRouteRow
+                      key={row.id}
+                      row={row}
+                      isExpanded={!!expandedRoutes[row.original.id]}
+                      columnCount={columnCount}
+                    />
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  href="#"
+                  onClick={(event) => {
+                    event.preventDefault()
+                    if (currentPage <= 1) return
+                    setCurrentPage((page) => page - 1)
+                  }}
+                  className={currentPage <= 1 ? 'pointer-events-none opacity-50' : undefined}
                 />
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationLink href="#" isActive onClick={(event) => event.preventDefault()}>
+                  {currentPage}
+                </PaginationLink>
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationNext
+                  href="#"
+                  onClick={(event) => {
+                    event.preventDefault()
+                    if (!hasNextPage) return
+                    setCurrentPage((page) => page + 1)
+                  }}
+                  className={!hasNextPage ? 'pointer-events-none opacity-50' : undefined}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
+      )}
     </section>
   )
 }

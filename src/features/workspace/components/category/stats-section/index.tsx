@@ -1,34 +1,24 @@
 import { cn } from '@/lib/utils'
 import { BarChart3, Fuel, Gauge, MapPin, Receipt } from 'lucide-react'
-
-type PieSlice = {
-  name: string
-  totalAmount: number
-  color: string
-  percentage: number
-}
-
-type PieChartData = {
-  slices: PieSlice[]
-  totalAmount: number
-  conicGradient: string
-}
+import { useStatsSection } from './useStatsSection'
 
 type StatsSectionProps = {
-  totalReceiptAmount: number
-  totalRoutes: number
-  totalKm: number
-  totalFuel: number
-  pieChartData: PieChartData
+  startDate: string
+  endDate: string
+  hasValidRange: boolean
 }
 
 export function StatsSection({
-  totalReceiptAmount,
-  totalRoutes,
-  totalKm,
-  totalFuel,
-  pieChartData,
+  startDate,
+  endDate,
+  hasValidRange,
 }: StatsSectionProps) {
+  const { totalReceiptAmount, totalRoutes, totalKm, totalFuel, pieChartData } = useStatsSection({
+    startDate,
+    endDate,
+    hasValidRange,
+  })
+
   return (
     <section className="space-y-6">
       <div className="grid grid-cols-2 gap-2.5 md:grid-cols-4">

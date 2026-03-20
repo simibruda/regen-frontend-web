@@ -584,6 +584,135 @@
         ]
       }
     },
+    "/category/{categoryId}/stats": {
+      "post": {
+        "description": "Retrieve receipt and route statistics for a category in a given date range.",
+        "operationId": "CategoryController_getCategoryStats",
+        "parameters": [
+          {
+            "name": "categoryId",
+            "required": true,
+            "in": "path",
+            "description": "Category ID to compute stats for",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "workspace-id",
+            "in": "header",
+            "description": "Workspace ID associated with the authenticated user",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "Date range for the category stats",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetCategoryStatsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Category stats retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryStatsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing or invalid workspace header or request payload"
+          },
+          "401": {
+            "description": "Missing or invalid JWT token"
+          },
+          "403": {
+            "description": "Workspace access is forbidden"
+          },
+          "404": {
+            "description": "Category was not found in the authenticated workspace"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Get category stats",
+        "tags": [
+          "Category"
+        ]
+      }
+    },
+    "/category/{categoryId}": {
+      "get": {
+        "description": "Retrieve a single category by id from the authenticated workspace.",
+        "operationId": "CategoryController_getCategoryById",
+        "parameters": [
+          {
+            "name": "categoryId",
+            "required": true,
+            "in": "path",
+            "description": "Category ID",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "workspace-id",
+            "in": "header",
+            "description": "Workspace ID associated with the authenticated user",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Category retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GetCategoryByIdResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing or invalid workspace header"
+          },
+          "401": {
+            "description": "Missing or invalid JWT token"
+          },
+          "403": {
+            "description": "Workspace access is forbidden"
+          },
+          "404": {
+            "description": "Category was not found in the authenticated workspace"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Get category by id",
+        "tags": [
+          "Category"
+        ]
+      }
+    },
     "/category/create": {
       "post": {
         "description": "Create a new category in the authenticated workspace. Accessible only by manager users.",
@@ -756,6 +885,70 @@
           }
         ],
         "summary": "Get workspace cars",
+        "tags": [
+          "Car"
+        ]
+      }
+    },
+    "/workspace/car/workspace/total-km": {
+      "post": {
+        "description": "Retrieve all active cars from the authenticated workspace with total kilometers in a date range for users assigned to a category.",
+        "operationId": "CarController_getWorkspaceCarsTotalKm",
+        "parameters": [
+          {
+            "name": "workspace-id",
+            "in": "header",
+            "description": "Workspace ID associated with the authenticated user",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "description": "Date range and category filter",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetWorkspaceCarsTotalKmRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Workspace cars with total kilometers retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/WorkspaceCarTotalKmResponse"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing or invalid workspace header or request payload"
+          },
+          "401": {
+            "description": "Missing or invalid JWT token"
+          },
+          "403": {
+            "description": "Workspace access is forbidden or admin role is required"
+          },
+          "404": {
+            "description": "Category was not found in the authenticated workspace"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Get workspace cars total km",
         "tags": [
           "Car"
         ]
@@ -1156,6 +1349,65 @@
           }
         ],
         "summary": "Get workspace receipts",
+        "tags": [
+          "Receipt"
+        ]
+      }
+    },
+    "/workspace/receipt/{receiptId}/blob": {
+      "get": {
+        "description": "Retrieve the blob URL for a specific receipt in the authenticated workspace.",
+        "operationId": "ReceiptController_getReceiptBlob",
+        "parameters": [
+          {
+            "name": "receiptId",
+            "required": true,
+            "in": "path",
+            "description": "Receipt ID to retrieve the blob URL for",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "workspace-id",
+            "in": "header",
+            "description": "Workspace ID associated with the authenticated user",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Receipt blob URL retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReceiptBlobResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing or invalid workspace header"
+          },
+          "401": {
+            "description": "Missing or invalid JWT token"
+          },
+          "403": {
+            "description": "Workspace access is forbidden"
+          },
+          "404": {
+            "description": "Receipt was not found in the authenticated workspace"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Get receipt blob",
         "tags": [
           "Receipt"
         ]
@@ -1760,6 +2012,153 @@
           "userIds"
         ]
       },
+      "GetCategoryStatsRequest": {
+        "type": "object",
+        "properties": {
+          "startDate": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+          }
+        },
+        "required": [
+          "startDate",
+          "endDate"
+        ]
+      },
+      "CategoryStatsResponse": {
+        "type": "object",
+        "properties": {
+          "categoryId": {
+            "type": "string"
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+          },
+          "totalReceiptAmount": {
+            "type": "number"
+          },
+          "totalRoutes": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "totalKm": {
+            "type": "number"
+          },
+          "totalFuel": {
+            "type": "number"
+          },
+          "receiptsByName": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "totalAmount": {
+                  "type": "number"
+                },
+                "percentage": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "name",
+                "totalAmount",
+                "percentage"
+              ]
+            }
+          }
+        },
+        "required": [
+          "categoryId",
+          "startDate",
+          "endDate",
+          "totalReceiptAmount",
+          "totalRoutes",
+          "totalKm",
+          "totalFuel",
+          "receiptsByName"
+        ]
+      },
+      "GetCategoryByIdResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "workspaceId": {
+            "type": "string"
+          },
+          "assignedUsers": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "firstName": {
+                  "type": "string"
+                },
+                "lastName": {
+                  "type": "string"
+                },
+                "avatar": {
+                  "type": "string",
+                  "nullable": true
+                }
+              },
+              "required": [
+                "id",
+                "firstName",
+                "lastName"
+              ]
+            }
+          },
+          "assignedUsersCount": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "workspaceId",
+          "assignedUsers",
+          "assignedUsersCount",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
       "CreateCategoryRequest": {
         "type": "object",
         "properties": {
@@ -1959,6 +2358,61 @@
           "workspaceId",
           "createdAt",
           "updatedAt"
+        ]
+      },
+      "GetWorkspaceCarsTotalKmRequest": {
+        "type": "object",
+        "properties": {
+          "startDate": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+          },
+          "categoryId": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "startDate",
+          "endDate",
+          "categoryId"
+        ]
+      },
+      "WorkspaceCarTotalKmResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "plateNumber": {
+            "type": "string"
+          },
+          "consumtion": {
+            "type": "number"
+          },
+          "totalKm": {
+            "type": "number"
+          },
+          "averageLiterConsumed": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "plateNumber",
+          "consumtion",
+          "totalKm",
+          "averageLiterConsumed"
         ]
       },
       "CreateRouteRequest": {
@@ -2800,6 +3254,22 @@
           "userId",
           "createdAt",
           "updatedAt"
+        ]
+      },
+      "ReceiptBlobResponse": {
+        "type": "object",
+        "properties": {
+          "receiptId": {
+            "type": "string"
+          },
+          "blobUrl": {
+            "type": "string",
+            "format": "uri"
+          }
+        },
+        "required": [
+          "receiptId",
+          "blobUrl"
         ]
       },
       "WorkspacePublicResponse": {

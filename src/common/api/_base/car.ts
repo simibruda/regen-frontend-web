@@ -8,10 +8,13 @@
 import type {
   CarControllerCreateCarHeaders,
   CarControllerGetWorkspaceCarsHeaders,
+  CarControllerGetWorkspaceCarsTotalKmHeaders,
   CarWorkspaceResponse,
   CreateCarRequest,
   GetCarsByWorkspaceRequest,
+  GetWorkspaceCarsTotalKmRequest,
   MutationResponse,
+  WorkspaceCarTotalKmResponse,
 } from './api-types.schemas'
 
 import { customInstance } from '../../../lib/axios'
@@ -55,9 +58,31 @@ export const carControllerGetWorkspaceCars = (
     options
   )
 }
+/**
+ * Retrieve all active cars from the authenticated workspace with total kilometers in a date range for users assigned to a category.
+ * @summary Get workspace cars total km
+ */
+export const carControllerGetWorkspaceCarsTotalKm = (
+  getWorkspaceCarsTotalKmRequest: GetWorkspaceCarsTotalKmRequest,
+  headers: CarControllerGetWorkspaceCarsTotalKmHeaders,
+  options?: SecondParameter<typeof customInstance<WorkspaceCarTotalKmResponse[]>>
+) => {
+  return customInstance<WorkspaceCarTotalKmResponse[]>(
+    {
+      url: `/workspace/car/workspace/total-km`,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...headers },
+      data: getWorkspaceCarsTotalKmRequest,
+    },
+    options
+  )
+}
 export type CarControllerCreateCarResult = NonNullable<
   Awaited<ReturnType<typeof carControllerCreateCar>>
 >
 export type CarControllerGetWorkspaceCarsResult = NonNullable<
   Awaited<ReturnType<typeof carControllerGetWorkspaceCars>>
+>
+export type CarControllerGetWorkspaceCarsTotalKmResult = NonNullable<
+  Awaited<ReturnType<typeof carControllerGetWorkspaceCarsTotalKm>>
 >
