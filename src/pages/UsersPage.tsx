@@ -3,6 +3,18 @@ import { useUsersPage } from '@/features/workspace/components/user-manager/useUs
 import { UsersTableSection } from '@/features/workspace/components/user-manager/users-table-section'
 import { Users } from 'lucide-react'
 
+export type UserRole = 'Manager' | 'Coordinator' | 'Field Worker'
+
+export type UserRow = {
+	id: string
+	firstName: string
+	lastName: string
+	role: UserRole
+	email: string
+	password: string
+	assignedCategories: string[]
+}
+
 export function UsersPage() {
 	const {
 		users,

@@ -1,9 +1,6 @@
 import { categories } from '@/common/mocks/categories'
 import type { AddUserFormValues } from '@/features/workspace/components/user-manager/add-user-modal/useAddUserModal'
-import type {
-    UserRole,
-    UserRow,
-} from '@/features/workspace/components/user-manager/users-table-section'
+import type { UserRole, UserRow } from '@/pages/UsersPage'
 import { useMemo, useState } from 'react'
 
 const roleByUserId: Partial<Record<string, UserRole>> = {

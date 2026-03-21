@@ -13,7 +13,7 @@ import {
     useAddUserModal,
     type AddUserFormValues,
 } from '@/features/workspace/components/user-manager/add-user-modal/useAddUserModal'
-import type { UserRole } from '@/features/workspace/components/user-manager/users-table-section'
+import type { UserRole } from '@/pages/UsersPage'
 import { Controller } from 'react-hook-form'
 
 type CategoryOption = {

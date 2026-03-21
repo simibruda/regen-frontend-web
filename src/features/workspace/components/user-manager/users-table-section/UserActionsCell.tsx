@@ -7,7 +7,7 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/common/components/_base/dialog'
-import type { UserRow } from '@/features/workspace/components/user-manager/users-table-section'
+import type { UserRow } from '@/pages/UsersPage'
 import { Eye, Trash2 } from 'lucide-react'
 
 type UserActionsCellProps = {

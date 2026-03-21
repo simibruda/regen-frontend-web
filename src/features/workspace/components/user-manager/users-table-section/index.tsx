@@ -1,21 +1,10 @@
 import { Button } from '@/common/components/_base/button'
 import { SharedDataTable } from '@/features/workspace/components/category/shared-data-table'
+import type { UserRow } from '@/pages/UsersPage'
 import { getCoreRowModel, useReactTable, type ColumnDef } from '@tanstack/react-table'
 import { Plus, Users } from 'lucide-react'
 import { useMemo } from 'react'
 import { UserActionsCell } from './UserActionsCell.tsx'
-
-export type UserRole = 'Manager' | 'Coordinator' | 'Field Worker'
-
-export type UserRow = {
-	id: string
-	firstName: string
-	lastName: string
-	role: UserRole
-	email: string
-	password: string
-	assignedCategories: string[]
-}
 
 type UsersTableSectionProps = {
 	users: UserRow[]
