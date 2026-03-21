@@ -1,8 +1,8 @@
 import { apiOptions } from '@/common/api'
 import type { GetCategoriesResponse } from '@/common/api/_base/api-types.schemas'
 import { Loader } from '@/common/components/_base/loader'
-import { CategoryAssignmentSection } from '@/features/workspace/components/categories-config/category-assignment-section'
 import { CategoriesTable } from '@/features/workspace/components/categories-config/categories-table'
+import { CategoryAssignmentSection } from '@/features/workspace/components/categories-config/category-assignment-section'
 import { CreateCategoryModal } from '@/features/workspace/components/categories-config/create-category-modal'
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { useMemo, useState, type UIEvent } from 'react'
@@ -11,7 +11,9 @@ const EMPTY_CATEGORIES: GetCategoriesResponse[] = []
 
 export function CategoriesConfigPage() {
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null)
-  const [pendingAssignedByCategory, setPendingAssignedByCategory] = useState<Record<string, string[]>>({})
+  const [pendingAssignedByCategory, setPendingAssignedByCategory] = useState<
+    Record<string, string[]>
+  >({})
 
   const { data: currentUser, isLoading: isCurrentUserLoading } = useQuery({
     ...apiOptions.queries.getCurrentUser,
@@ -32,12 +34,12 @@ export function CategoriesConfigPage() {
 
   const categories = useMemo(
     () => categoriesData?.pages.flatMap((page) => page) ?? EMPTY_CATEGORIES,
-    [categoriesData],
+    [categoriesData]
   )
 
   const selectedCategory = useMemo(
     () => categories.find((category) => category.id === selectedCategoryId) ?? null,
-    [categories, selectedCategoryId],
+    [categories, selectedCategoryId]
   )
 
   const isLoading = isCurrentUserLoading || isCategoriesLoading

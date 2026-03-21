@@ -52,6 +52,7 @@ export function HomePage() {
   }
 
   return (
+    
     <main className="min-h-full bg-background p-4 pb-36 md:p-5 md:pb-5">
       <HomeRoutesSection workspaceId={workspaceId} />
       <CategorySection
