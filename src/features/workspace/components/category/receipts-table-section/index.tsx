@@ -1,8 +1,8 @@
 import { apiOptions } from '@/common/api'
 import { RECEIPTS_PAGE_LIMIT } from '@/common/api/receipt/receipt.queries'
 import type { ReceiptWorkspaceResponse } from '@/common/api/_base/api-types.schemas'
-import { Button } from '@/common/components/_base/button'
 import { Loader } from '@/common/components/_base/loader'
+import { ReceiptDownloadButton } from '@/features/workspace/components/category/receipt-download-button'
 import {
   Pagination,
   PaginationContent,
@@ -11,22 +11,24 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@/common/components/_base/pagination'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { useParams } from '@tanstack/react-router'
 import { getCoreRowModel, useReactTable, type ColumnDef } from '@tanstack/react-table'
 import dayjs from 'dayjs'
-import { Download, FileText } from 'lucide-react'
-import { useCallback, useMemo, useState } from 'react'
+import { FileText } from 'lucide-react'
+import { useMemo, useState } from 'react'
 import { SharedDataTable } from '../shared-data-table'
 
 type ReceiptsTableSectionProps = {
   startDate: string
   endDate: string
+  categoryName: string
 }
 
 export function ReceiptsTableSection({
   startDate,
   endDate,
+  categoryName,
 }: ReceiptsTableSectionProps) {
   const { id: categoryId } = useParams({ from: '/_auth-guard/category/$id' })
   const { data: currentUser } = useQuery({
@@ -36,7 +38,6 @@ export function ReceiptsTableSection({
   const enabled = Boolean(workspaceId && categoryId)
 
   const [currentPage, setCurrentPage] = useState(1)
-  const queryClient = useQueryClient()
   const { data: receipts = [], isLoading } = useQuery({
     ...apiOptions.queries.getWorkspaceReceipts(
       workspaceId,
@@ -48,23 +49,6 @@ export function ReceiptsTableSection({
     enabled,
   })
   const hasNextPage = receipts.length === RECEIPTS_PAGE_LIMIT
-
-  const handleDownloadReceipt = useCallback(
-    async (receiptId: string) => {
-      if (!workspaceId) return
-
-      const response = await queryClient.fetchQuery(
-        apiOptions.queries.getReceiptBlob(workspaceId, receiptId)
-      )
-
-      const link = document.createElement('a')
-      link.href = response.blobUrl
-      link.target = '_blank'
-      link.rel = 'noopener noreferrer'
-      link.click()
-    },
-    [queryClient, workspaceId],
-  )
 
   const receiptColumns = useMemo<ColumnDef<ReceiptWorkspaceResponse>[]>(
     () => [
@@ -83,19 +67,15 @@ export function ReceiptsTableSection({
         header: '',
         id: 'download',
         cell: ({ row }) => (
-          <Button
-            size="sm"
-            variant="outline"
-            className="border-border text-foreground hover:bg-secondary"
-            onClick={() => void handleDownloadReceipt(row.original.id)}
-          >
-            <Download className="h-4 w-4" />
-            Download
-          </Button>
+          <ReceiptDownloadButton
+            workspaceId={workspaceId}
+            receipt={row.original}
+            categoryName={categoryName}
+          />
         ),
       },
     ],
-    [handleDownloadReceipt],
+    [categoryName, workspaceId],
   )
 
   const receiptTable = useReactTable({
@@ -105,20 +85,17 @@ export function ReceiptsTableSection({
   })
 
   return (
-    <section className="space-y-3">
-      <div className="flex items-center gap-2">
-        <FileText className="h-5 w-5 text-primary" />
-        <h2 className="text-lg font-semibold text-foreground">Receipts</h2>
-      </div>
-      <p className="mt-0.5 pl-7 text-sm text-muted-foreground">
-        Includes place, amount, date, and file download action.
+    <section className="space-y-4">
+      <p className="text-sm text-muted-foreground">
+        <FileText className="me-1.5 inline h-4 w-4 align-text-bottom text-primary" />
+        Place, amount, date — download the original file when needed.
       </p>
       {isLoading ? (
-        <div className="mt-8">
+        <div className="py-10">
           <Loader />
         </div>
       ) : (
-        <div className="mt-4 space-y-3">
+        <div className="space-y-4">
           <div className="overflow-x-auto">
             <SharedDataTable table={receiptTable} emptyMessage="No receipts for selected date range." />
           </div>

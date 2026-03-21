@@ -20,126 +20,155 @@ export function StatsSection({
   })
 
   return (
-    <section className="space-y-6">
-      <div className="grid grid-cols-2 gap-2.5 md:grid-cols-4">
+    <section className="space-y-8">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard
-          icon={<Receipt className="h-5 w-5 text-blue-700" />}
-          label="Total Receipts"
+          icon={<Receipt className="h-5 w-5" />}
+          label="Total receipts"
           value={formatCurrency(totalReceiptAmount)}
-          cardClassName="border-l-blue-600 bg-blue-50/80"
-          iconWrapClassName="bg-blue-100"
+          accent="blue"
         />
         <StatCard
-          icon={<MapPin className="h-5 w-5 text-emerald-700" />}
-          label="Total Routes"
+          icon={<MapPin className="h-5 w-5" />}
+          label="Total routes"
           value={String(totalRoutes)}
-          cardClassName="border-l-emerald-600 bg-emerald-50/80"
-          iconWrapClassName="bg-emerald-100"
+          accent="emerald"
         />
         <StatCard
-          icon={<Gauge className="h-5 w-5 text-violet-700" />}
+          icon={<Gauge className="h-5 w-5" />}
           label="Total KM"
           value={totalKm.toLocaleString()}
-          cardClassName="border-l-violet-600 bg-violet-50/80"
-          iconWrapClassName="bg-violet-100"
+          accent="violet"
         />
         <StatCard
-          icon={<Fuel className="h-5 w-5 text-amber-700" />}
-          label="Approx. Fuel"
+          icon={<Fuel className="h-5 w-5" />}
+          label="Approx. fuel"
           value={`${totalFuel.toFixed(1)} L`}
-          cardClassName="border-l-amber-600 bg-amber-50/80"
-          iconWrapClassName="bg-amber-100"
+          accent="amber"
         />
       </div>
 
-      <div className="grid grid-cols-1 gap-6">
-        <section className="rounded-xl p-2 md:p-4">
-          <div className="flex items-center gap-2">
-            <BarChart3 className="h-5 w-5 text-primary" />
-            <h2 className="text-lg font-semibold text-foreground">Receipts grouped by name</h2>
+      <section className="overflow-hidden rounded-2xl border border-border/80 bg-card shadow-sm ring-1 ring-black/5 dark:ring-white/10">
+        <div className="border-b border-border/60 bg-muted/30 px-5 py-4 md:px-6">
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+              <BarChart3 className="h-5 w-5" />
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold tracking-tight text-foreground md:text-xl">
+                Spending by place
+              </h2>
+              <p className="text-sm text-muted-foreground">
+                Share of receipt totals in the selected period.
+              </p>
+            </div>
           </div>
-          <p className="mt-0.5 pl-7 text-sm text-muted-foreground">Amounts for selected start/end dates.</p>
+        </div>
 
-          <div className="mt-5 grid grid-cols-1 gap-8 md:grid-cols-[300px_1fr] md:items-center">
-            {pieChartData.slices.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No receipt data in selected range.</p>
-            ) : (
-              <>
-                <div className="mx-auto">
-                  <div
-                    className="relative h-64 w-64 rounded-full"
-                    style={{ backgroundImage: pieChartData.conicGradient }}
-                    aria-label="Receipts distribution pie chart"
-                  >
-                    <div className="absolute inset-9 rounded-full bg-background" />
-                  </div>
+        <div className="p-5 md:p-8">
+          {pieChartData.slices.length === 0 ? (
+            <p className="py-8 text-center text-sm text-muted-foreground">
+              No receipt data in this date range.
+            </p>
+          ) : (
+            <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-[minmax(0,280px)_1fr] lg:gap-12">
+              <div className="flex justify-center">
+                <div
+                  className="relative h-56 w-56 shrink-0 rounded-full shadow-lg ring-4 ring-background md:h-64 md:w-64"
+                  style={{ backgroundImage: pieChartData.conicGradient }}
+                  aria-label="Receipts distribution chart"
+                >
+                  <div className="absolute inset-[22%] rounded-full bg-card shadow-inner ring-1 ring-border/50" />
                 </div>
+              </div>
 
-                <div className="space-y-1.5">
-                  {pieChartData.slices.map((item) => (
-                    <div
-                      key={item.name}
-                      className="flex items-center justify-between px-2 py-1"
-                    >
-                      <span className="flex items-center gap-2 font-medium text-foreground">
-                        <span
-                          className="inline-block h-2.5 w-2.5 rounded-full"
-                          style={{ backgroundColor: item.color }}
-                        />
-                        {item.name}
+              <div className="space-y-2">
+                {pieChartData.slices.map((item) => (
+                  <div
+                    key={item.name}
+                    className="flex items-center justify-between gap-4 rounded-xl border border-transparent bg-muted/20 px-4 py-3 transition-colors hover:border-border hover:bg-muted/40"
+                  >
+                    <span className="flex min-w-0 items-center gap-3 font-medium text-foreground">
+                      <span
+                        className="h-3 w-3 shrink-0 rounded-full shadow-sm ring-2 ring-background"
+                        style={{ backgroundColor: item.color }}
+                      />
+                      <span className="truncate">{item.name}</span>
+                    </span>
+                    <span className="shrink-0 text-right">
+                      <span className="block text-sm font-semibold tabular-nums text-foreground">
+                        {formatCurrency(item.totalAmount)}
                       </span>
-                      <span className="text-right">
-                        <span className="block text-sm font-semibold tabular-nums text-foreground">
-                          {formatCurrency(item.totalAmount)}
-                        </span>
-                        <span className="block text-xs text-muted-foreground">
-                          {item.percentage.toFixed(1)}%
-                        </span>
+                      <span className="text-xs text-muted-foreground">
+                        {item.percentage.toFixed(1)}%
                       </span>
-                    </div>
-                  ))}
-                  <div className="mt-1 flex items-center justify-between border-t border-border px-2 pt-2">
-                    <span className="font-semibold text-foreground">Total</span>
-                    <span className="text-sm font-bold tabular-nums text-foreground">
-                      {formatCurrency(pieChartData.totalAmount)}
                     </span>
                   </div>
+                ))}
+                <div className="mt-3 flex items-center justify-between rounded-xl border border-border/80 bg-primary/5 px-4 py-3">
+                  <span className="font-semibold text-foreground">Total</span>
+                  <span className="text-base font-bold tabular-nums text-foreground">
+                    {formatCurrency(pieChartData.totalAmount)}
+                  </span>
                 </div>
-              </>
-            )}
-          </div>
-        </section>
-      </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
     </section>
   )
 }
+
+const accentStyles = {
+  blue: {
+    icon: 'bg-blue-500/15 text-blue-700 dark:text-blue-400',
+    bar: 'bg-blue-500',
+  },
+  emerald: {
+    icon: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-400',
+    bar: 'bg-emerald-500',
+  },
+  violet: {
+    icon: 'bg-violet-500/15 text-violet-700 dark:text-violet-400',
+    bar: 'bg-violet-500',
+  },
+  amber: {
+    icon: 'bg-amber-500/15 text-amber-800 dark:text-amber-400',
+    bar: 'bg-amber-500',
+  },
+} as const
 
 function StatCard({
   icon,
   label,
   value,
-  cardClassName,
-  iconWrapClassName,
+  accent,
 }: {
   icon: React.ReactNode
   label: string
   value: string
-  cardClassName?: string
-  iconWrapClassName?: string
+  accent: keyof typeof accentStyles
 }) {
+  const a = accentStyles[accent]
   return (
-    <div className={cn('flex items-center gap-2.5 rounded-lg border-l-4 px-3 py-2', cardClassName)}>
-      <div
-        className={cn(
-          'flex h-7 w-7 shrink-0 items-center justify-center rounded-md',
-          iconWrapClassName,
-        )}
-      >
-        {icon}
-      </div>
-      <div className="min-w-0">
-        <p className="truncate text-[11px] leading-tight text-muted-foreground">{label}</p>
-        <p className="truncate text-lg leading-tight font-bold tabular-nums text-foreground">{value}</p>
+    <div className="group relative overflow-hidden rounded-2xl border border-border/80 bg-card p-4 shadow-sm ring-1 ring-black/5 transition-shadow hover:shadow-md dark:ring-white/10">
+      <div className={cn('absolute inset-x-0 top-0 h-1 rounded-t-2xl', a.bar)} />
+      <div className="flex items-start gap-3 pt-1">
+        <div
+          className={cn(
+            'flex h-11 w-11 shrink-0 items-center justify-center rounded-xl transition-transform group-hover:scale-105',
+            a.icon,
+          )}
+        >
+          {icon}
+        </div>
+        <div className="min-w-0 flex-1 space-y-0.5">
+          <p className="text-xs font-medium text-muted-foreground">{label}</p>
+          <p className="text-xl font-bold tabular-nums tracking-tight text-foreground md:text-2xl">
+            {value}
+          </p>
+        </div>
       </div>
     </div>
   )

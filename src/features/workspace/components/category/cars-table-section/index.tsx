@@ -68,13 +68,10 @@ export function CarsTableSection({
   })
 
   return (
-    <section className="space-y-3">
-      <div className="flex items-center gap-2">
-        <CarIcon className="h-5 w-5 text-primary" />
-        <h2 className="text-lg font-semibold text-foreground">Cars</h2>
-      </div>
-      <p className="mt-0.5 pl-7 text-sm text-muted-foreground">
-        Workspace cars with total km and approximate fuel use for selected dates.
+    <section className="space-y-4">
+      <p className="text-sm text-muted-foreground">
+        <CarIcon className="me-1.5 inline h-4 w-4 align-text-bottom text-primary" />
+        Total km and approximate fuel for this category in the selected range.
       </p>
       {renderBody(isLoading, <SharedDataTable table={carTable} emptyMessage="No cars available." />)}
     </section>
@@ -84,11 +81,11 @@ export function CarsTableSection({
 function renderBody(isLoading: boolean, table: ReactNode) {
   if (isLoading) {
     return (
-      <div className="mt-8">
+      <div className="py-10">
         <Loader />
       </div>
     )
   }
 
-  return <div className="mt-4 overflow-x-auto">{table}</div>
+  return <div className="overflow-x-auto">{table}</div>
 }

@@ -37,8 +37,8 @@ export function CategoryPage() {
 
   if (isLoading) {
     return (
-      <main className="min-h-full bg-background p-4 pb-36 md:p-5 md:pb-5">
-        <div className="mx-auto mt-20 max-w-5xl">
+      <main className="min-h-full bg-linear-to-b from-primary/6 via-background to-background p-4 pb-36 md:p-6 md:pb-8">
+        <div className="mx-auto mt-20 max-w-6xl">
           <Loader />
         </div>
       </main>
@@ -50,8 +50,8 @@ export function CategoryPage() {
   }
 
   return (
-    <main className="min-h-full bg-background p-4 pb-36 md:p-5 md:pb-5">
-      <div className="mx-auto max-w-5xl space-y-8">
+    <main className="min-h-full bg-linear-to-b from-primary/7 via-background to-muted/30 p-4 pb-36 md:p-6 md:pb-8">
+      <div className="mx-auto max-w-6xl space-y-10 md:space-y-12">
         <CategoryPageHeader
           categoryName={category.name}
           startDate={startDate}
@@ -70,6 +70,7 @@ export function CategoryPage() {
         <CategoryRecordsSection
           startDate={startDateIso}
           endDate={endDateIso}
+          categoryName={category.name}
           activeTab={activeTab}
           onTabChange={setActiveTab}
         />
