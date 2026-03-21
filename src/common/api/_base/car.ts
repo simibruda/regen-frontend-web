@@ -41,19 +41,20 @@ export const carControllerCreateCar = (
   )
 }
 /**
- * Retrieve active cars from the authenticated workspace using filters, sorting, and pagination from request body.
+ * Retrieve active cars from the authenticated workspace using filters, sorting, pagination, and optional searchValue (name or plate number) from request body.
  * @summary Get workspace cars
  */
 export const carControllerGetWorkspaceCars = (
   headers: CarControllerGetWorkspaceCarsHeaders,
-  _getCarsByWorkspaceRequest?: GetCarsByWorkspaceRequest,
+  getCarsByWorkspaceRequest?: GetCarsByWorkspaceRequest,
   options?: SecondParameter<typeof customInstance<CarWorkspaceResponse[]>>
 ) => {
   return customInstance<CarWorkspaceResponse[]>(
     {
       url: `/workspace/car/workspace`,
-      method: 'GET',
+      method: 'POST',
       headers: { 'Content-Type': 'application/json', ...headers },
+      data: getCarsByWorkspaceRequest,
     },
     options
   )

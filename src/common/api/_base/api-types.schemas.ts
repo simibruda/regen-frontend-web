@@ -337,6 +337,7 @@ export interface GetCarsByWorkspaceRequest {
   sortBy?: string
   sortOrder?: GetCarsByWorkspaceRequestSortOrder
   where?: GetCarsByWorkspaceRequestWhere
+  searchValue?: string
 }
 
 export interface CarWorkspaceResponse {

@@ -830,8 +830,8 @@
       }
     },
     "/workspace/car/workspace": {
-      "get": {
-        "description": "Retrieve active cars from the authenticated workspace using filters, sorting, and pagination from request body.",
+      "post": {
+        "description": "Retrieve active cars from the authenticated workspace using filters, sorting, pagination, and optional searchValue (name or plate number) from request body.",
         "operationId": "CarController_getWorkspaceCars",
         "parameters": [
           {
@@ -2323,6 +2323,9 @@
                 ]
               }
             }
+          },
+          "searchValue": {
+            "type": "string"
           }
         }
       },

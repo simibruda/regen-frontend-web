@@ -8,11 +8,7 @@ import {
   DialogTitle,
 } from '@/common/components/_base/dialog'
 import { InputField } from '@/common/components/_base/input-field'
-import {
-  SelectField,
-} from '@/common/components/_base/select-field'
 import { SearchableSelectField } from '@/common/components/_base/searchable-select-field'
-import { cars } from '@/common/mocks/cars'
 import { GripVertical, MapPin, Plus, Trash2 } from 'lucide-react'
 import { Controller } from 'react-hook-form'
 import { useAddRouteModal } from './useAddRouteModal'
@@ -32,6 +28,9 @@ export function AddRouteModal({ mobile = false }: AddRouteModalProps) {
     setDragIndex,
     categorySearchValue,
     setCategorySearchValue,
+    carSearchValue,
+    setCarSearchValue,
+    carOptions,
     workspaceId,
     register,
     control,
@@ -143,13 +142,18 @@ export function AddRouteModal({ mobile = false }: AddRouteModalProps) {
               name="carId"
               control={control}
               render={({ field: { value, onChange } }) => (
-                <SelectField
+                <SearchableSelectField
                   id="carId"
                   label="Car"
+                  placeholder="Select a car"
+                  searchPlaceholder="Search by name or plate…"
+                  noOptionsText="No cars found."
                   error={errors.carId?.message}
-                  options={cars.map((car) => ({ value: car.id, label: car.label }))}
+                  options={carOptions}
                   value={value}
                   onValueChange={onChange}
+                  searchValue={carSearchValue}
+                  onSearchValueChange={setCarSearchValue}
                 />
               )}
             />

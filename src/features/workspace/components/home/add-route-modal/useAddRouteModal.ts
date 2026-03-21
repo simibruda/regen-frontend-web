@@ -37,12 +37,15 @@ const defaultValues = {
   stops: [{ order: 1, name: '' }],
 }
 const CATEGORY_SEARCH_DEBOUNCE_MS = 500
+const CAR_SEARCH_DEBOUNCE_MS = 500
 
 export function useAddRouteModal() {
   const [open, setOpen] = useState(false)
   const [dragIndex, setDragIndex] = useState<number | null>(null)
   const [categorySearchValue, setCategorySearchValue] = useState('')
   const [debouncedCategorySearchValue, setDebouncedCategorySearchValue] = useState('')
+  const [carSearchValue, setCarSearchValue] = useState('')
+  const [debouncedCarSearchValue, setDebouncedCarSearchValue] = useState('')
 
   useEffect(() => {
     const timeoutId = window.setTimeout(() => {
@@ -51,12 +54,24 @@ export function useAddRouteModal() {
 
     return () => window.clearTimeout(timeoutId)
   }, [categorySearchValue])
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      setDebouncedCarSearchValue(carSearchValue)
+    }, CAR_SEARCH_DEBOUNCE_MS)
+
+    return () => window.clearTimeout(timeoutId)
+  }, [carSearchValue])
   const { data: currentUser } = useSuspenseQuery({
     ...apiOptions.queries.getCurrentUser,
   })
   const workspaceId = currentUser.workspaceId
   const { data: myCategories } = useQuery({
     ...apiOptions.queries.getMyCategories(workspaceId, debouncedCategorySearchValue.trim()),
+  })
+  const { data: workspaceCars } = useQuery({
+    ...apiOptions.queries.getWorkspaceCars(workspaceId, debouncedCarSearchValue.trim()),
+    enabled: Boolean(workspaceId) && open,
   })
   const queryClient = useQueryClient()
   const { mutateAsync: createRouteMutation } = useMutation({
@@ -89,6 +104,15 @@ export function useAddRouteModal() {
     [myCategories]
   )
 
+  const carOptions = useMemo(
+    () =>
+      (workspaceCars ?? []).map((car) => ({
+        value: car.id,
+        label: `${car.name} (${car.plateNumber})`,
+      })),
+    [workspaceCars]
+  )
+
   const syncOrders = useCallback(() => {
     const currentStops = getValues('stops')
     const orderedStops = currentStops.map((stop, index) => ({
@@ -103,6 +127,7 @@ export function useAddRouteModal() {
       reset(defaultValues)
       setDragIndex(null)
       setCategorySearchValue('')
+      setCarSearchValue('')
     }
     setOpen(nextOpen)
   }
@@ -162,6 +187,9 @@ export function useAddRouteModal() {
     setDragIndex,
     categorySearchValue,
     setCategorySearchValue,
+    carSearchValue,
+    setCarSearchValue,
+    carOptions,
     workspaceId,
     register,
     control,
