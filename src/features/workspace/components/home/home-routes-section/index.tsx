@@ -40,7 +40,7 @@ export function HomeRoutesSection({ workspaceId }: HomeRoutesSectionProps) {
               <Route className="h-6 w-6 text-primary" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-foreground">Open routes</h1>
+              <h1 className="text-2xl font-bold text-foreground" >Open routes</h1>
               <p className="mt-0.5 text-sm text-muted-foreground">
                 Your routes still in progress (no end km).
               </p>

@@ -1,9 +1,9 @@
-import { LayoutGrid } from 'lucide-react'
 import type { Category } from '@/common/mocks/categories'
-import { CategoryCard } from '../category-card'
-import { AddRouteModal } from '../add-route-modal'
-import { AddReceiptModal } from '../add-receipt-modal'
+import { LayoutGrid } from 'lucide-react'
 import { useEffect, useRef } from 'react'
+import { AddReceiptModal } from '../add-receipt-modal'
+import { AddRouteModal } from '../add-route-modal'
+import { CategoryCard } from '../category-card'
 
 type CategorySectionProps = {
   categories: Category[]
@@ -49,7 +49,7 @@ export function CategorySection({
               <LayoutGrid className="h-6 w-6 text-primary" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-foreground">Categories</h2>
+              <h2 className="text-xl font-bold text-foreground">Categories</h2>
               <p className="mt-0.5 text-sm text-muted-foreground">
                 {categories.length} categories &middot; {totalPeople} people assigned
               </p>
@@ -57,7 +57,6 @@ export function CategorySection({
           </div>
 
           {/* Desktop buttons — hidden on mobile */}
-        
         </div>
 
         <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
