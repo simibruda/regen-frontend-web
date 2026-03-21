@@ -20,7 +20,7 @@ import { z } from 'zod'
 const stopSchema = z.object({
   order: z.number().int().min(1),
   name: z.string().min(1, 'Stop name is required'),
-})
+})  
 
 const routeSchema = z.object({
   startKm: z
