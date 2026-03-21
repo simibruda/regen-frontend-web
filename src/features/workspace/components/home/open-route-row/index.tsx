@@ -29,7 +29,7 @@ export function OpenRouteRow({ workspaceId, route }: OpenRouteRowProps) {
       <button
         type="button"
         onClick={() => setEndKmOpen(true)}
-        className="flex w-full flex-col gap-1 rounded-xl border border-border bg-card px-4 py-3 text-left transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:flex-row sm:items-center sm:justify-between"
+        className="flex w-full cursor-pointer flex-col gap-1 rounded-xl border border-border bg-card px-4 py-3 text-left transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:flex-row sm:items-center sm:justify-between"
       >
         <div className="min-w-0">
           <p className="font-medium text-foreground">

@@ -31,12 +31,16 @@ export type RouteTableRow = {
   userDisplayName: string
   carName: string
   plateNumber: string
-  userId: string
   date: string
   startKm: number
   endKm: number | null
   routeKm: number | null
   stops: { order: number; name: string }[]
+}
+
+function routePointLabel(index: number) {
+  if (index === 0) return 'Starting point'
+  return `Stop ${index}`
 }
 
 function userInitials(firstName: string, lastName: string) {
@@ -94,7 +98,6 @@ export function RoutesTableSection({
           userDisplayName: `${route.firstName} ${route.lastName}`.trim() || '—',
           carName: car?.name ?? 'Unknown',
           plateNumber: car?.plateNumber ?? 'N/A',
-          userId: route.userId,
           date: route.date,
           startKm: route.startKm,
           endKm,
@@ -110,38 +113,13 @@ export function RoutesTableSection({
   const routeColumns = useMemo<ColumnDef<RouteTableRow>[]>(
     () => [
       {
-        header: 'Avatar',
-        id: 'avatar',
-        cell: ({ row }) => {
-          const { userAvatarUrl, userDisplayName } = row.original
-          if (userAvatarUrl) {
-            return (
-              <img
-                src={userAvatarUrl}
-                alt=""
-                className="h-8 w-8 rounded-full object-cover"
-              />
-            )
-          }
-          return (
-            <div
-              className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/15 text-xs font-semibold text-primary"
-              title={userDisplayName}
-            >
-              {userInitials(row.original.userFirstName, row.original.userLastName)}
-            </div>
-          )
-        },
-      },
-      { header: 'User Name', accessorKey: 'userDisplayName' },
-      {
         header: '',
         id: 'expand',
         cell: ({ row }) => (
           <Button
             size="icon"
             variant="ghost"
-            className="h-8 w-8 rounded-md text-primary hover:bg-secondary"
+            className="h-8 w-8 shrink-0 rounded-md text-primary hover:bg-secondary"
             onClick={() =>
               setExpandedRoutes((prev) => ({ ...prev, [row.original.id]: !prev[row.original.id] }))
             }
@@ -154,9 +132,37 @@ export function RoutesTableSection({
           </Button>
         ),
       },
+      {
+        header: 'User',
+        id: 'user',
+        accessorKey: 'userDisplayName',
+        cell: ({ row }) => {
+          const { userAvatarUrl, userDisplayName } = row.original
+          return (
+            <div className="flex min-w-0 max-w-[220px] items-center gap-2 sm:max-w-xs">
+              {userAvatarUrl ? (
+                <img
+                  src={userAvatarUrl}
+                  alt=""
+                  className="h-8 w-8 shrink-0 rounded-full object-cover"
+                />
+              ) : (
+                <div
+                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/15 text-xs font-semibold text-primary"
+                  title={userDisplayName}
+                >
+                  {userInitials(row.original.userFirstName, row.original.userLastName)}
+                </div>
+              )}
+              <span className="min-w-0 truncate font-medium text-foreground" title={userDisplayName}>
+                {userDisplayName}
+              </span>
+            </div>
+          )
+        },
+      },
       { header: 'Car Name', accessorKey: 'carName' },
       { header: 'Plate Number', accessorKey: 'plateNumber' },
-      { header: 'User ID', accessorKey: 'userId' },
       {
         header: 'Date',
         accessorKey: 'date',
@@ -298,10 +304,15 @@ function ExpandableRouteRow({
                 {row.original.stops.map((stop, index) => (
                   <div key={`${row.original.id}-${stop.order}`} className="flex items-center gap-2">
                     <div className="group flex items-center gap-2 rounded-lg px-3 py-2 transition-all hover:-translate-y-0.5">
-                      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/15 text-xs font-semibold text-primary">
-                        {stop.order}
+                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/15 text-xs font-semibold text-primary">
+                        {index === 0 ? 'S' : index}
                       </span>
-                      <span className="text-sm font-medium text-foreground">{stop.name}</span>
+                      <span className="flex min-w-0 flex-col gap-0.5">
+                        <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                          {routePointLabel(index)}
+                        </span>
+                        <span className="text-sm font-medium text-foreground">{stop.name}</span>
+                      </span>
                     </div>
                     {index < row.original.stops.length - 1 && (
                       <ArrowRight className="h-4 w-4 text-primary/70" aria-hidden />
