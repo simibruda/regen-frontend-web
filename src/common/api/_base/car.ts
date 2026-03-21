@@ -46,7 +46,7 @@ export const carControllerCreateCar = (
  */
 export const carControllerGetWorkspaceCars = (
   headers: CarControllerGetWorkspaceCarsHeaders,
-  getCarsByWorkspaceRequest?: GetCarsByWorkspaceRequest,
+  _getCarsByWorkspaceRequest?: GetCarsByWorkspaceRequest,
   options?: SecondParameter<typeof customInstance<CarWorkspaceResponse[]>>
 ) => {
   return customInstance<CarWorkspaceResponse[]>(
