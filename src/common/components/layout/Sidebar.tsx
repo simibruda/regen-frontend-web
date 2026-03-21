@@ -1,5 +1,4 @@
-import { Link, useRouterState } from '@tanstack/react-router'
-import { LogOut } from 'lucide-react'
+import { apiOptions } from '@/common/api'
 import {
   Sidebar,
   SidebarContent,
@@ -12,10 +11,14 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/common/components/_base/sidebar'
-import { managerNavigation } from '@/common/config/navigation'
+import { navigationList } from '@/common/config/navigation'
 import { LOCAL_STORAGE_KEYS } from '@/common/constants/local-storage.constants'
+import { useSuspenseQuery } from '@tanstack/react-query'
+import { Link, useRouterState } from '@tanstack/react-router'
+import { LogOut } from 'lucide-react'
 
 export function AppSidebar() {
+  const { data: user } = useSuspenseQuery(apiOptions.queries.getCurrentUser)
   const router = useRouterState()
   const currentPath = router.location.pathname
 
@@ -34,13 +37,12 @@ export function AppSidebar() {
         </Link>
       </SidebarHeader>
 
-
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Navigation</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {managerNavigation.map((item) => (
+              {navigationList[user.role].map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
                     isActive={currentPath === item.to}
