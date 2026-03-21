@@ -5,5 +5,9 @@ export const Route = createFileRoute('/_auth-guard/_manager-guard/cars')({
 })
 
 function RouteComponent() {
-  return <div>THIS PAGE IS WIP</div>
+  return (
+    <div>
+      <h1 className="text-2xl font-bold text-black">THIS PAGE IS WIP</h1>
+    </div>
+  )
 }

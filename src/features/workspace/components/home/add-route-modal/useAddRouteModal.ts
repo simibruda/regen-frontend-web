@@ -20,7 +20,7 @@ const routeSchema = z.object({
   carId: z.string().min(1, 'Car is required'),
   stops: z
     .array(stopSchema)
-    .min(1, 'At least one stop is required')
+    .min(2, 'Add at least two route points')
     .refine((stops) => new Set(stops.map((s) => s.order)).size === stops.length, {
       message: 'Stop order must be unique',
       path: ['stops'],
@@ -34,7 +34,10 @@ const defaultValues = {
   date: dayjs().format('YYYY-MM-DD'),
   categoryId: '',
   carId: '',
-  stops: [{ order: 1, name: '' }],
+  stops: [
+    { order: 1, name: '' },
+    { order: 2, name: '' },
+  ],
 }
 const CATEGORY_SEARCH_DEBOUNCE_MS = 500
 const CAR_SEARCH_DEBOUNCE_MS = 500

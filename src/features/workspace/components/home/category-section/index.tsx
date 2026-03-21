@@ -42,14 +42,14 @@ export function CategorySection({
 
   return (
     <>
-      <div className="mx-auto max-w-5xl">
+      <div>
         <div className="mb-5 flex items-start justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="rounded-xl bg-secondary p-2.5">
               <LayoutGrid className="h-6 w-6 text-primary" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-foreground">Categories</h1>
+              <h2 className="text-2xl font-bold text-foreground">Categories</h2>
               <p className="mt-0.5 text-sm text-muted-foreground">
                 {categories.length} categories &middot; {totalPeople} people assigned
               </p>
@@ -57,10 +57,7 @@ export function CategorySection({
           </div>
 
           {/* Desktop buttons — hidden on mobile */}
-          <div className="hidden items-center gap-2 md:flex">
-            <AddRouteModal />
-            <AddReceiptModal />
-          </div>
+        
         </div>
 
         <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">

@@ -59,7 +59,6 @@ export const carControllerGetWorkspaceCars = (
     options
   )
 }
-
 /**
  * Retrieve all active cars from the authenticated workspace with total kilometers in a date range for users assigned to a category.
  * @summary Get workspace cars total km

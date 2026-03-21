@@ -25,6 +25,10 @@ import { useMemo, useState } from 'react'
 
 export type RouteTableRow = {
   id: string
+  userAvatarUrl: string | null
+  userFirstName: string
+  userLastName: string
+  userDisplayName: string
   carName: string
   plateNumber: string
   userId: string
@@ -33,6 +37,15 @@ export type RouteTableRow = {
   endKm: number | null
   routeKm: number | null
   stops: { order: number; name: string }[]
+}
+
+function userInitials(firstName: string, lastName: string) {
+  const a = firstName.trim().charAt(0)
+  const b = lastName.trim().charAt(0)
+  if (a && b) return `${a}${b}`.toUpperCase()
+  if (a) return a.toUpperCase()
+  if (b) return b.toUpperCase()
+  return '?'
 }
 
 type RoutesTableSectionProps = {
@@ -75,6 +88,10 @@ export function RoutesTableSection({
         const endKm = route.endKm
         return {
           id: route.id,
+          userAvatarUrl: route.avatar ?? null,
+          userFirstName: route.firstName,
+          userLastName: route.lastName,
+          userDisplayName: `${route.firstName} ${route.lastName}`.trim() || '—',
           carName: car?.name ?? 'Unknown',
           plateNumber: car?.plateNumber ?? 'N/A',
           userId: route.userId,
@@ -92,6 +109,31 @@ export function RoutesTableSection({
 
   const routeColumns = useMemo<ColumnDef<RouteTableRow>[]>(
     () => [
+      {
+        header: 'Avatar',
+        id: 'avatar',
+        cell: ({ row }) => {
+          const { userAvatarUrl, userDisplayName } = row.original
+          if (userAvatarUrl) {
+            return (
+              <img
+                src={userAvatarUrl}
+                alt=""
+                className="h-8 w-8 rounded-full object-cover"
+              />
+            )
+          }
+          return (
+            <div
+              className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/15 text-xs font-semibold text-primary"
+              title={userDisplayName}
+            >
+              {userInitials(row.original.userFirstName, row.original.userLastName)}
+            </div>
+          )
+        },
+      },
+      { header: 'User Name', accessorKey: 'userDisplayName' },
       {
         header: '',
         id: 'expand',

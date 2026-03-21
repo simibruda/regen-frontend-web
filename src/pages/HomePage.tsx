@@ -2,6 +2,7 @@ import { apiOptions } from '@/common/api'
 import { Loader } from '@/common/components/_base/loader'
 import type { Category } from '@/common/mocks/categories'
 import { CategorySection } from '@/features/workspace/components/home/category-section'
+import { HomeRoutesSection } from '@/features/workspace/components/home/home-routes-section'
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { useCallback } from 'react'
 
@@ -52,6 +53,7 @@ export function HomePage() {
 
   return (
     <main className="min-h-full bg-background p-4 pb-36 md:p-5 md:pb-5">
+      <HomeRoutesSection workspaceId={workspaceId} />
       <CategorySection
         categories={categories}
         hasNextPage={Boolean(hasNextPage)}

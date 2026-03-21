@@ -21,6 +21,12 @@ function formatKmWithSpaces(value: string) {
   return value.replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
 }
 
+/** First route item is the starting point; further items are Stop 1, 2, … */
+function getRoutePointLabel(index: number) {
+  if (index === 0) return 'Starting point'
+  return `Stop ${index}`
+}
+
 export function AddRouteModal({ mobile = false }: AddRouteModalProps) {
   const {
     open,
@@ -188,7 +194,7 @@ export function AddRouteModal({ mobile = false }: AddRouteModalProps) {
                       <div className="flex items-center gap-2">
                         <GripVertical className="h-4 w-4 cursor-grab text-accent" />
                         <span className="text-xs font-semibold text-foreground">
-                          Stop #{index + 1}
+                          {getRoutePointLabel(index)}
                         </span>
                       </div>
                       <Button
@@ -197,7 +203,7 @@ export function AddRouteModal({ mobile = false }: AddRouteModalProps) {
                         variant="ghost"
                         className="h-7 w-7 rounded-md text-destructive hover:bg-destructive hover:text-white"
                         onClick={() => handleRemoveStop(index)}
-                        disabled={fields.length === 1}
+                        disabled={fields.length === 2}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -211,7 +217,7 @@ export function AddRouteModal({ mobile = false }: AddRouteModalProps) {
 
                     <InputField
                       id={`stop-name-${field.id}`}
-                      label="Stop Name"
+                      label="Name"
                       error={errors.stops?.[index]?.name?.message}
                       {...register(`stops.${index}.name`)}
                     />

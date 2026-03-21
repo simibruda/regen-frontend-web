@@ -59,22 +59,22 @@ export const GetUsersByWorkspaceRequestSortOrder = {
 
 export type GetUsersByWorkspaceRequestWhereFirstName =
   | { [key: string]: string }
-  | { [key: string]: number }
+  | { [key: string]: number | null }
   | { [key: string]: boolean }
 
 export type GetUsersByWorkspaceRequestWhereLastName =
   | { [key: string]: string }
-  | { [key: string]: number }
+  | { [key: string]: number | null }
   | { [key: string]: boolean }
 
 export type GetUsersByWorkspaceRequestWhereEmail =
   | { [key: string]: string }
-  | { [key: string]: number }
+  | { [key: string]: number | null }
   | { [key: string]: boolean }
 
 export type GetUsersByWorkspaceRequestWhereRole =
   | { [key: string]: string }
-  | { [key: string]: number }
+  | { [key: string]: number | null }
   | { [key: string]: boolean }
 
 export type GetUsersByWorkspaceRequestWhere = {
@@ -140,7 +140,7 @@ export const GetMyCategoriesRequestSortOrder = {
 
 export type GetMyCategoriesRequestWhereName =
   | { [key: string]: string }
-  | { [key: string]: number }
+  | { [key: string]: number | null }
   | { [key: string]: boolean }
 
 export type GetMyCategoriesRequestWhere = {
@@ -199,7 +199,7 @@ export const GetWorkspaceCategoriesRequestSortOrder = {
 
 export type GetWorkspaceCategoriesRequestWhereName =
   | { [key: string]: string }
-  | { [key: string]: number }
+  | { [key: string]: number | null }
   | { [key: string]: boolean }
 
 export type GetWorkspaceCategoriesRequestWhere = {
@@ -304,17 +304,17 @@ export const GetCarsByWorkspaceRequestSortOrder = {
 
 export type GetCarsByWorkspaceRequestWhereName =
   | { [key: string]: string }
-  | { [key: string]: number }
+  | { [key: string]: number | null }
   | { [key: string]: boolean }
 
 export type GetCarsByWorkspaceRequestWherePlateNumber =
   | { [key: string]: string }
-  | { [key: string]: number }
+  | { [key: string]: number | null }
   | { [key: string]: boolean }
 
 export type GetCarsByWorkspaceRequestWhereConsumtion =
   | { [key: string]: string }
-  | { [key: string]: number }
+  | { [key: string]: number | null }
   | { [key: string]: boolean }
 
 export type GetCarsByWorkspaceRequestWhere = {
@@ -402,32 +402,32 @@ export const GetMyRoutesRequestSortOrder = {
 
 export type GetMyRoutesRequestWhereUserId =
   | { [key: string]: string }
-  | { [key: string]: number }
+  | { [key: string]: number | null }
   | { [key: string]: boolean }
 
 export type GetMyRoutesRequestWhereCarId =
   | { [key: string]: string }
-  | { [key: string]: number }
+  | { [key: string]: number | null }
   | { [key: string]: boolean }
 
 export type GetMyRoutesRequestWhereCategoryId =
   | { [key: string]: string }
-  | { [key: string]: number }
+  | { [key: string]: number | null }
   | { [key: string]: boolean }
 
 export type GetMyRoutesRequestWhereStartKm =
   | { [key: string]: string }
-  | { [key: string]: number }
+  | { [key: string]: number | null }
   | { [key: string]: boolean }
 
 export type GetMyRoutesRequestWhereEndKm =
   | { [key: string]: string }
-  | { [key: string]: number }
+  | { [key: string]: number | null }
   | { [key: string]: boolean }
 
 export type GetMyRoutesRequestWhereDate =
   | { [key: string]: string }
-  | { [key: string]: number }
+  | { [key: string]: number | null }
   | { [key: string]: boolean }
 
 export type GetMyRoutesRequestWhere = {
@@ -455,6 +455,18 @@ export interface GetMyRoutesRequest {
   where?: GetMyRoutesRequestWhere
 }
 
+export type GetMyRoutesResponseCar = {
+  id: string
+  name: string
+  plateNumber: string
+  consumtion: number
+  workspaceId: string
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
+  createdAt: string
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
+  updatedAt: string
+}
+
 export type GetMyRoutesResponseRouteItemsItem = {
   id: string
   name: string
@@ -479,6 +491,7 @@ export interface GetMyRoutesResponse {
   /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
   date: string
   carId: string
+  car: GetMyRoutesResponseCar
   workspaceId: string
   /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
   createdAt: string
@@ -497,32 +510,32 @@ export const GetRoutesByWorkspaceRequestSortOrder = {
 
 export type GetRoutesByWorkspaceRequestWhereUserId =
   | { [key: string]: string }
-  | { [key: string]: number }
+  | { [key: string]: number | null }
   | { [key: string]: boolean }
 
 export type GetRoutesByWorkspaceRequestWhereCarId =
   | { [key: string]: string }
-  | { [key: string]: number }
+  | { [key: string]: number | null }
   | { [key: string]: boolean }
 
 export type GetRoutesByWorkspaceRequestWhereCategoryId =
   | { [key: string]: string }
-  | { [key: string]: number }
+  | { [key: string]: number | null }
   | { [key: string]: boolean }
 
 export type GetRoutesByWorkspaceRequestWhereStartKm =
   | { [key: string]: string }
-  | { [key: string]: number }
+  | { [key: string]: number | null }
   | { [key: string]: boolean }
 
 export type GetRoutesByWorkspaceRequestWhereEndKm =
   | { [key: string]: string }
-  | { [key: string]: number }
+  | { [key: string]: number | null }
   | { [key: string]: boolean }
 
 export type GetRoutesByWorkspaceRequestWhereDate =
   | { [key: string]: string }
-  | { [key: string]: number }
+  | { [key: string]: number | null }
   | { [key: string]: boolean }
 
 export type GetRoutesByWorkspaceRequestWhere = {
@@ -550,6 +563,18 @@ export interface GetRoutesByWorkspaceRequest {
   where?: GetRoutesByWorkspaceRequestWhere
 }
 
+export type RouteWorkspaceResponseCar = {
+  id: string
+  name: string
+  plateNumber: string
+  consumtion: number
+  workspaceId: string
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
+  createdAt: string
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
+  updatedAt: string
+}
+
 export type RouteWorkspaceResponseRouteItemsItem = {
   id: string
   name: string
@@ -574,6 +599,7 @@ export interface RouteWorkspaceResponse {
   /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
   date: string
   carId: string
+  car: RouteWorkspaceResponseCar
   workspaceId: string
   /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
   createdAt: string
@@ -581,6 +607,10 @@ export interface RouteWorkspaceResponse {
   updatedAt: string
   routeItems: RouteWorkspaceResponseRouteItemsItem[]
   userId: string
+  firstName: string
+  lastName: string
+  /** @nullable */
+  avatar?: string | null
 }
 
 export interface UpdateRouteEndKmRequest {
@@ -598,27 +628,27 @@ export const GetReceiptsByWorkspaceRequestSortOrder = {
 
 export type GetReceiptsByWorkspaceRequestWhereUserId =
   | { [key: string]: string }
-  | { [key: string]: number }
+  | { [key: string]: number | null }
   | { [key: string]: boolean }
 
 export type GetReceiptsByWorkspaceRequestWhereCategoryId =
   | { [key: string]: string }
-  | { [key: string]: number }
+  | { [key: string]: number | null }
   | { [key: string]: boolean }
 
 export type GetReceiptsByWorkspaceRequestWhereAmount =
   | { [key: string]: string }
-  | { [key: string]: number }
+  | { [key: string]: number | null }
   | { [key: string]: boolean }
 
 export type GetReceiptsByWorkspaceRequestWherePlace =
   | { [key: string]: string }
-  | { [key: string]: number }
+  | { [key: string]: number | null }
   | { [key: string]: boolean }
 
 export type GetReceiptsByWorkspaceRequestWhereDate =
   | { [key: string]: string }
-  | { [key: string]: number }
+  | { [key: string]: number | null }
   | { [key: string]: boolean }
 
 export type GetReceiptsByWorkspaceRequestWhere = {
