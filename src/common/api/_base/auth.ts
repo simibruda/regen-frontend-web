@@ -6,70 +6,93 @@
  * OpenAPI spec version: 1.0
  */
 import type {
+  AuthControllerGetCurrentWorkspaceHeaders,
+  AuthControllerRegisterBody,
   CurrentUserResponse,
+  CurrentWorkspaceResponse,
   LoginRequest,
   LoginResponse,
-  RegisterRequest,
-} from "./api-types.schemas";
+} from './api-types.schemas'
 
-import { customInstance } from "../../../lib/axios";
+import { customInstance } from '../../../lib/axios'
 
-type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1]
 
 /**
  * Retrieve detailed profile information for the currently authenticated user including personal details, profile type, and associated salon information.
  * @summary Get current authenticated user
  */
 export const authControllerGetCurrentUser = (
-  options?: SecondParameter<typeof customInstance<CurrentUserResponse>>,
+  options?: SecondParameter<typeof customInstance<CurrentUserResponse>>
 ) => {
-  return customInstance<CurrentUserResponse>(
-    { url: `/auth/current`, method: "GET" },
-    options,
-  );
-};
+  return customInstance<CurrentUserResponse>({ url: `/auth/current`, method: 'GET' }, options)
+}
+/**
+ * Retrieve workspace information for the current authenticated user context.
+ * @summary Get current workspace
+ */
+export const authControllerGetCurrentWorkspace = (
+  headers: AuthControllerGetCurrentWorkspaceHeaders,
+  options?: SecondParameter<typeof customInstance<CurrentWorkspaceResponse>>
+) => {
+  return customInstance<CurrentWorkspaceResponse>(
+    { url: `/auth/current-workspace`, method: 'GET', headers },
+    options
+  )
+}
 /**
  * Authenticate user with email and password
  * @summary User Login
  */
 export const authControllerLogin = (
   loginRequest: LoginRequest,
-  options?: SecondParameter<typeof customInstance<LoginResponse>>,
+  options?: SecondParameter<typeof customInstance<LoginResponse>>
 ) => {
   return customInstance<LoginResponse>(
     {
       url: `/auth/login`,
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       data: loginRequest,
     },
-    options,
-  );
-};
+    options
+  )
+}
 /**
  * Register a new user or update password for existing user
  * @summary User Registration
  */
 export const authControllerRegister = (
-  registerRequest: RegisterRequest,
-  options?: SecondParameter<typeof customInstance<LoginResponse>>,
+  authControllerRegisterBody: AuthControllerRegisterBody,
+  options?: SecondParameter<typeof customInstance<LoginResponse>>
 ) => {
+  const formData = new FormData()
+  formData.append(`email`, authControllerRegisterBody.email)
+  formData.append(`password`, authControllerRegisterBody.password)
+  formData.append(`firstName`, authControllerRegisterBody.firstName)
+  formData.append(`lastName`, authControllerRegisterBody.lastName)
+  if (authControllerRegisterBody.workspaceId !== undefined) {
+    formData.append(`workspaceId`, authControllerRegisterBody.workspaceId)
+  }
+  if (authControllerRegisterBody.workspaceName !== undefined) {
+    formData.append(`workspaceName`, authControllerRegisterBody.workspaceName)
+  }
+  if (authControllerRegisterBody.avatar !== undefined) {
+    formData.append(`avatar`, authControllerRegisterBody.avatar)
+  }
+
   return customInstance<LoginResponse>(
-    {
-      url: `/auth/register`,
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      data: registerRequest,
-    },
-    options,
-  );
-};
+    { url: `/auth/register`, method: 'POST', data: formData },
+    options
+  )
+}
 export type AuthControllerGetCurrentUserResult = NonNullable<
   Awaited<ReturnType<typeof authControllerGetCurrentUser>>
->;
-export type AuthControllerLoginResult = NonNullable<
-  Awaited<ReturnType<typeof authControllerLogin>>
->;
+>
+export type AuthControllerGetCurrentWorkspaceResult = NonNullable<
+  Awaited<ReturnType<typeof authControllerGetCurrentWorkspace>>
+>
+export type AuthControllerLoginResult = NonNullable<Awaited<ReturnType<typeof authControllerLogin>>>
 export type AuthControllerRegisterResult = NonNullable<
   Awaited<ReturnType<typeof authControllerRegister>>
->;
+>

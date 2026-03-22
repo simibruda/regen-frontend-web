@@ -9,8 +9,8 @@ export function SharedDataTable<TData>({ table, emptyMessage }: SharedDataTableP
   const colSpan = table.getAllLeafColumns().length
 
   return (
-    <table className="min-w-full border-separate border-spacing-0 overflow-hidden rounded-xl border border-border text-sm">
-      <thead className="bg-secondary text-left text-xs uppercase tracking-wide text-muted-foreground">
+    <table className="min-w-full border-separate border-spacing-0 overflow-hidden rounded-2xl border border-border/80 text-sm shadow-sm">
+      <thead className="bg-muted/50 text-left text-xs font-semibold uppercase tracking-wider text-muted-foreground">
         {table.getHeaderGroups().map((headerGroup) => (
           <tr key={headerGroup.id}>
             {headerGroup.headers.map((header) => (

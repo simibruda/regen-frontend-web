@@ -1,10 +1,12 @@
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
-import { Link } from '@tanstack/react-router'
-import { toast } from 'sonner'
+import { apiOptions } from '@/common/api'
 import { Button } from '@/common/components/_base/button'
 import { InputField } from '@/common/components/_base/input-field'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useMutation } from '@tanstack/react-query'
+import { Link, useNavigate } from '@tanstack/react-router'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import { z } from 'zod'
 
 const loginSchema = z.object({
   email: z.string().min(1, 'Email is required').email('Invalid email address'),
@@ -14,6 +16,12 @@ const loginSchema = z.object({
 type LoginFormValues = z.infer<typeof loginSchema>
 
 export function LoginPage() {
+  const navigate = useNavigate()
+
+  const { mutateAsync: loginMutation } = useMutation({
+    ...apiOptions.mutations.login,
+  })
+
   const {
     register,
     handleSubmit,
@@ -22,9 +30,15 @@ export function LoginPage() {
     resolver: zodResolver(loginSchema),
   })
 
-  function onSubmit(data: LoginFormValues) {
-    console.log('Login submitted:', data)
-    toast.success('Login successful!')
+  async function onSubmit(data: LoginFormValues) {
+    try {
+      await loginMutation(data)
+      toast.success('Login successful!')
+      navigate({ to: '/' })
+    } catch (error) {
+      console.error(error)
+      toast.error('Failed to login')
+    }
   }
 
   return (
@@ -42,12 +56,8 @@ export function LoginPage() {
               <span className="font-bold">Re</span>
               <span className="font-normal">Manage</span>
             </p>
-            <h1 className="text-xl font-medium tracking-tight text-primary">
-              Login
-            </h1>
-            <p className="text-xs text-black/50">
-              Enter your email and password to continue.
-            </p>
+            <h1 className="text-xl font-medium tracking-tight text-primary">Login</h1>
+            <p className="text-xs text-black/50">Enter your email and password to continue.</p>
           </header>
 
           <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
@@ -74,12 +84,7 @@ export function LoginPage() {
               </Link>
             </p>
 
-            <Button
-              type="submit"
-              variant="default"
-              className="mt-2 w-full"
-              disabled={isSubmitting}
-            >
+            <Button type="submit" variant="default" className="mt-2 w-full" disabled={isSubmitting}>
               {isSubmitting ? 'Logging in...' : 'Login'}
             </Button>
           </form>

@@ -1,16 +1,25 @@
-import { Outlet, createFileRoute } from '@tanstack/react-router'
+import { CurrentUserResponseRole } from '@/common/api/_base/api-types.schemas'
+import { authQueryOptions } from '@/common/api/auth/auth.queries'
+import { queryClient } from '@/lib/tanstack-query'
+import { Outlet, createFileRoute, redirect } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_auth-guard/_manager-guard')({
   beforeLoad: async () => {
-    // TODO: add a validation get the current user and if is not a manager then it should redirect to /
+    try {
+      const user = await queryClient.fetchQuery(authQueryOptions.getCurrentUser)
 
-    // const user = await getUser()
-    // if (!user) {
-    //   return redirect({ to: '/' })
-    // }
-    // if (user.role !== 'manager') {
-    //   return redirect({ to: '/' })
-    // }
+      if (!user) {
+        throw new Error('No user found')
+      }
+
+      if (user.role !== CurrentUserResponseRole.ADMIN) {
+        return redirect({ to: '/' })
+      }
+
+      return { user }
+    } catch {
+      return redirect({ to: '/login' })
+    }
   },
   component: Outlet,
 })

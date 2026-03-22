@@ -8,249 +8,253 @@ import {
   DialogTitle,
 } from '@/common/components/_base/dialog'
 import { InputField } from '@/common/components/_base/input-field'
-import { SelectField } from '@/common/components/_base/select-field'
-import { cars } from '@/common/mocks/cars'
-import { zodResolver } from '@hookform/resolvers/zod'
-import dayjs from 'dayjs'
+import { SearchableSelectField } from '@/common/components/_base/searchable-select-field'
 import { GripVertical, MapPin, Plus, Trash2 } from 'lucide-react'
-import { useCallback, useState } from 'react'
-import { Controller, useFieldArray, useForm } from 'react-hook-form'
-import { z } from 'zod'
-
-const stopSchema = z.object({
-  order: z.number().int().min(1),
-  name: z.string().min(1, 'Stop name is required'),
-})  
-
-const routeSchema = z.object({
-  startKm: z
-    .string()
-    .min(1, 'Start KM is required')
-    .regex(/^\d+(\.\d{1,2})?$/, 'Enter a valid number (max 2 decimals)'),
-  date: z.string().min(1, 'Date is required'),
-  carId: z.string().min(1, 'Car is required'),
-  stops: z
-    .array(stopSchema)
-    .min(1, 'At least one stop is required')
-    .refine((stops) => new Set(stops.map((s) => s.order)).size === stops.length, {
-      message: 'Stop order must be unique',
-      path: ['stops'],
-    }),
-})
-
-type RouteFormValues = z.infer<typeof routeSchema>
+import { Controller } from 'react-hook-form'
+import { useAddRouteModal } from './useAddRouteModal'
 
 type AddRouteModalProps = {
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  mobile?: boolean
 }
 
-const defaultValues: RouteFormValues = {
-  startKm: '',
-  date: dayjs().format('YYYY-MM-DD'),
-  carId: '',
-  stops: [{ order: 1, name: '' }],
+function formatKmWithSpaces(value: string) {
+  return value.replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
 }
 
-export function AddRouteModal({ open, onOpenChange }: AddRouteModalProps) {
-  const [dragIndex, setDragIndex] = useState<number | null>(null)
+/** First route item is the starting point; further items are Stop 1, 2, … */
+function getRoutePointLabel(index: number) {
+  if (index === 0) return 'Starting point'
+  return `Stop ${index}`
+}
+
+export function AddRouteModal({ mobile = false }: AddRouteModalProps) {
   const {
+    open,
+    setOpen,
+    setDragIndex,
+    categorySearchValue,
+    setCategorySearchValue,
+    carSearchValue,
+    setCarSearchValue,
+    carOptions,
+    workspaceId,
     register,
     control,
     handleSubmit,
-    reset,
-    setValue,
-    getValues,
-    formState: { errors, isSubmitting },
-  } = useForm<RouteFormValues>({
-    resolver: zodResolver(routeSchema),
-    defaultValues,
-  })
-
-  const { fields, append, remove, move } = useFieldArray({
-    control,
-    name: 'stops',
-  })
-
-  const syncOrders = useCallback(() => {
-    const currentStops = getValues('stops')
-    const orderedStops = currentStops.map((stop, index) => ({
-      ...stop,
-      order: index + 1,
-    }))
-    setValue('stops', orderedStops, { shouldValidate: true, shouldDirty: true })
-  }, [getValues, setValue])
-
-  function handleOpenChange(nextOpen: boolean) {
-    if (!nextOpen) {
-      reset(defaultValues)
-      setDragIndex(null)
-    }
-    onOpenChange(nextOpen)
-  }
-
-  function handleClose() {
-    handleOpenChange(false)
-  }
-
-  function onSubmit(data: RouteFormValues) {
-    console.log('Route submitted:', data)
-    handleClose()
-  }
-
-  function handleAddStop() {
-    append({ order: fields.length + 1, name: '' })
-  }
-
-  function handleRemoveStop(index: number) {
-    remove(index)
-    requestAnimationFrame(syncOrders)
-  }
-
-  function handleDrop(targetIndex: number) {
-    if (dragIndex === null || dragIndex === targetIndex) {
-      setDragIndex(null)
-      return
-    }
-
-    move(dragIndex, targetIndex)
-    setDragIndex(null)
-    requestAnimationFrame(syncOrders)
-  }
+    errors,
+    isSubmitting,
+    filteredCategoryOptions,
+    fields,
+    handleOpenChange,
+    handleClose,
+    onSubmit,
+    handleAddStop,
+    handleRemoveStop,
+    handleDrop,
+  } = useAddRouteModal()
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent>
-        <DialogHeader className="rounded-t-2xl bg-gradient-to-r from-primary to-primary-2 p-4 pb-3">
-          <DialogTitle className="flex items-center gap-2 text-white">
-            <MapPin className="h-5 w-5" />
-            Add Route
-          </DialogTitle>
-          <DialogDescription className="text-white/75">
-            Set route details and order the stops by dragging.
-          </DialogDescription>
-        </DialogHeader>
+    <>
+      {mobile ? (
+        <Button
+          size="lg"
+          variant="outline"
+          className="rounded-full border-border text-foreground shadow-lg hover:bg-secondary"
+          onClick={() => setOpen(true)}
+          disabled={!workspaceId}
+        >
+          <MapPin className="h-5 w-5 text-primary" />
+          Add Route
+        </Button>
+      ) : (
+        <Button
+          variant="outline"
+          className="border-border text-foreground hover:bg-secondary"
+          onClick={() => setOpen(true)}
+          disabled={!workspaceId}
+        >
+          <MapPin className="h-4 w-4 text-primary" />
+          Add Route
+        </Button>
+      )}
 
-        <form className="flex flex-col gap-2 overflow-y-auto px-4" onSubmit={handleSubmit(onSubmit)}>
-          <InputField
-            id="startKm"
-            label="Start KM"
-            inputMode="decimal"
-            error={errors.startKm?.message}
-            {...register('startKm')}
-          />
+      <Dialog open={open} onOpenChange={handleOpenChange}>
+        <DialogContent>
+          <DialogHeader className="rounded-t-2xl bg-linear-to-r from-primary to-primary-2 p-4 pb-3">
+            <DialogTitle className="flex items-center gap-2 text-white">
+              <MapPin className="h-5 w-5" />
+              Add Route
+            </DialogTitle>
+            <DialogDescription className="text-white/75">
+              Set route details and order the stops by dragging.
+            </DialogDescription>
+          </DialogHeader>
 
-          <InputField
-            id="routeDate"
-            type="date"
-            label="Date"
-            error={errors.date?.message}
-            {...register('date')}
-          />
-
-          <Controller
-            name="carId"
-            control={control}
-            render={({ field: { value, onChange } }) => (
-              <SelectField
-                id="carId"
-                label="Car"
-                error={errors.carId?.message}
-                options={cars.map((car) => ({ value: car.id, label: car.label }))}
-                value={value}
-                onValueChange={onChange}
-              />
-            )}
-          />
-
-          <div className="mt-1">
-            <div className="mb-2 flex items-center justify-between">
-              <p className="text-sm font-semibold text-primary">Stops</p>
-              <Button
-                type="button"
-                size="sm"
-                variant="outline"
-                className="border-accent bg-accent text-accent-foreground hover:bg-accent-2"
-                onClick={handleAddStop}
-              >
-                <Plus className="h-4 w-4" />
-                Add Stop
-              </Button>
-            </div>
-
-            <div className="max-h-72 space-y-2 overflow-y-auto pr-1">
-              {fields.map((field, index) => (
-                <div
-                  key={field.id}
-                  draggable
-                  onDragStart={() => setDragIndex(index)}
-                  onDragEnd={() => setDragIndex(null)}
-                  onDragOver={(event) => event.preventDefault()}
-                  onDrop={() => handleDrop(index)}
-                  className="rounded-lg border-l-4 border-l-accent border border-border bg-white p-2"
-                >
-                  <div className="mb-2 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <GripVertical className="h-4 w-4 cursor-grab text-accent" />
-                      <span className="text-xs font-semibold text-foreground">Stop #{index + 1}</span>
-                    </div>
-                    <Button
-                      type="button"
-                      size="icon"
-                      variant="ghost"
-                      className="h-7 w-7 rounded-md text-destructive hover:bg-destructive hover:text-white"
-                      onClick={() => handleRemoveStop(index)}
-                      disabled={fields.length === 1}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-
-                  <input
-                    type="hidden"
-                    value={index + 1}
-                    {...register(`stops.${index}.order`, { valueAsNumber: true })}
-                  />
-
-                  <InputField
-                    id={`stop-name-${field.id}`}
-                    label="Stop Name"
-                    error={errors.stops?.[index]?.name?.message}
-                    {...register(`stops.${index}.name`)}
-                  />
-                </div>
-              ))}
-            </div>
-
-            <div className="h-4">
-              {errors.stops?.message && (
-                <p className="text-xs text-destructive">{errors.stops.message}</p>
+          <form
+            className="flex flex-col gap-2 overflow-y-auto px-4"
+            onSubmit={handleSubmit(onSubmit)}
+          >
+            <Controller
+              name="startKm"
+              control={control}
+              render={({ field: { value, onChange, onBlur, name, ref } }) => (
+                <InputField
+                  id="startKm"
+                  name={name}
+                  ref={ref}
+                  label="Start KM"
+                  type="text"
+                  inputMode="numeric"
+                  value={formatKmWithSpaces(value?.toString() ?? '')}
+                  onBlur={onBlur}
+                  onChange={(event) => {
+                    const digitsOnly = event.target.value.replace(/\D/g, '')
+                    onChange(digitsOnly === '' ? 0 : Number(digitsOnly))
+                  }}
+                  error={errors.startKm?.message}
+                />
               )}
-            </div>
-          </div>
+            />
 
-          <DialogFooter className="border-t border-border/50 px-0">
-            <div className="flex gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                className="flex-1 border-border text-muted-foreground hover:bg-secondary"
-                onClick={handleClose}
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                variant="default"
-                className="flex-1 bg-accent text-accent-foreground shadow-cta hover:bg-accent-2"
-                disabled={isSubmitting}
-              >
-                {isSubmitting ? 'Saving...' : 'Save Route'}
-              </Button>
+            <InputField
+              id="routeDate"
+              type="date"
+              label="Date"
+              error={errors.date?.message}
+              {...register('date')}
+            />
+
+            <Controller
+              name="categoryId"
+              control={control}
+              render={({ field: { onChange, value } }) => (
+                <SearchableSelectField
+                  id="categoryId"
+                  label="Category"
+                  placeholder="Select a category"
+                  searchPlaceholder="Search categories..."
+                  noOptionsText="No categories found."
+                  error={errors.categoryId?.message}
+                  options={filteredCategoryOptions}
+                  value={value}
+                  onValueChange={onChange}
+                  searchValue={categorySearchValue}
+                  onSearchValueChange={setCategorySearchValue}
+                />
+              )}
+            />
+
+            <Controller
+              name="carId"
+              control={control}
+              render={({ field: { value, onChange } }) => (
+                <SearchableSelectField
+                  id="carId"
+                  label="Car"
+                  placeholder="Select a car"
+                  searchPlaceholder="Search by name or plate…"
+                  noOptionsText="No cars found."
+                  error={errors.carId?.message}
+                  options={carOptions}
+                  value={value}
+                  onValueChange={onChange}
+                  searchValue={carSearchValue}
+                  onSearchValueChange={setCarSearchValue}
+                />
+              )}
+            />
+
+            <div className="mt-1">
+              <div className="mb-2 flex items-center justify-between">
+                <p className="text-sm font-semibold text-primary">Stops</p>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  className="border-accent bg-accent text-accent-foreground hover:bg-accent-2"
+                  onClick={handleAddStop}
+                >
+                  <Plus className="h-4 w-4" />
+                  Add Stop
+                </Button>
+              </div>
+
+              <div className="max-h-72 space-y-2 overflow-y-auto pr-1">
+                {fields.map((field, index) => (
+                  <div
+                    key={field.id}
+                    draggable
+                    onDragStart={() => setDragIndex(index)}
+                    onDragEnd={() => setDragIndex(null)}
+                    onDragOver={(event) => event.preventDefault()}
+                    onDrop={() => handleDrop(index)}
+                    className="rounded-lg border-l-4 border-l-accent border border-border bg-white p-2"
+                  >
+                    <div className="mb-2 flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <GripVertical className="h-4 w-4 cursor-grab text-accent" />
+                        <span className="text-xs font-semibold text-foreground">
+                          {getRoutePointLabel(index)}
+                        </span>
+                      </div>
+                      <Button
+                        type="button"
+                        size="icon"
+                        variant="ghost"
+                        className="h-7 w-7 rounded-md text-destructive hover:bg-destructive hover:text-white"
+                        onClick={() => handleRemoveStop(index)}
+                        disabled={fields.length === 2}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+
+                    <input
+                      type="hidden"
+                      value={index + 1}
+                      {...register(`stops.${index}.order`, { valueAsNumber: true })}
+                    />
+
+                    <InputField
+                      id={`stop-name-${field.id}`}
+                      label="Name"
+                      error={errors.stops?.[index]?.name?.message}
+                      {...register(`stops.${index}.name`)}
+                    />
+                  </div>
+                ))}
+              </div>
+
+              <div className="h-4">
+                {errors.stops?.message && (
+                  <p className="text-xs text-destructive">{errors.stops.message}</p>
+                )}
+              </div>
             </div>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
+
+            <DialogFooter className="border-t border-border/50 px-0">
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="flex-1 border-border text-muted-foreground hover:bg-secondary"
+                  onClick={handleClose}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  variant="default"
+                  className="flex-1 bg-accent text-accent-foreground shadow-cta hover:bg-accent-2"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? 'Saving...' : 'Save Route'}
+                </Button>
+              </div>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }

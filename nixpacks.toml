@@ -1,0 +1,5 @@
+# Default Nixpacks nixpkgs ships Node 22.11.x, which is below Vite 8 / Rolldown (22.12+).
+# Pin nixpkgs so CI (Coolify) gets a compatible Node 22.x.
+# See: https://coolify.io/docs/applications/build-packs/nixpacks/node-versioning
+[phases.setup]
+nixpkgsArchive = "9cf7092bdd603554bd8b63c216e8943cf9b12512"

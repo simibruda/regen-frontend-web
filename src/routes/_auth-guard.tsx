@@ -1,16 +1,21 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { authQueryOptions } from '@/common/api/auth/auth.queries'
 import { Layout } from '@/common/components/layout/Layout'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_auth-guard')({
-  beforeLoad: async () => {
+  beforeLoad: async ({ context }) => {
+    const { queryClient } = context
+    try {
+      const user = await queryClient.fetchQuery(authQueryOptions.getCurrentUser)
 
-    //TODO: Add get current user if is not provided that is should redirect to the login page
-    // const user = await getUser()
-    // if (!user) {
-    //   return redirect({ to: '/login' })
-    // }
-    // return { user }
+      if (!user) {
+        throw new Error('No user found')
+      }
+
+      return { user }
+    } catch {
+      return redirect({ to: '/login' })
+    }
   },
   component: Layout,
 })
-

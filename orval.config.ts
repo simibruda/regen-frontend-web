@@ -3,7 +3,7 @@ import { defineConfig } from 'orval'
 export default defineConfig({
   store: {
     input: {
-      target: 'http://localhost:3000/static/docs/openapi.json',
+      target: './openapi.sanitized.json',
     },
     output: {
       headers: true,

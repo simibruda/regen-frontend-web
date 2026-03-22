@@ -5,25 +5,23 @@
  * API description
  * OpenAPI spec version: 1.0
  */
-import type { HealthCheckControllerGetHealth200 } from "./api-types.schemas";
+import type { HealthCheckControllerGetHealth200 } from './api-types.schemas'
 
-import { customInstance } from "../../../lib/axios";
+import { customInstance } from '../../../lib/axios'
 
-type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1];
+type SecondParameter<T extends (...args: never) => unknown> = Parameters<T>[1]
 
 /**
  * @summary Get comprehensive health status
  */
 export const healthCheckControllerGetHealth = (
-  options?: SecondParameter<
-    typeof customInstance<HealthCheckControllerGetHealth200>
-  >,
+  options?: SecondParameter<typeof customInstance<HealthCheckControllerGetHealth200>>
 ) => {
   return customInstance<HealthCheckControllerGetHealth200>(
-    { url: `/health`, method: "GET" },
-    options,
-  );
-};
+    { url: `/health`, method: 'GET' },
+    options
+  )
+}
 export type HealthCheckControllerGetHealthResult = NonNullable<
   Awaited<ReturnType<typeof healthCheckControllerGetHealth>>
->;
+>

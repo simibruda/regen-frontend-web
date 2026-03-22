@@ -5,95 +5,899 @@
  * API description
  * OpenAPI spec version: 1.0
  */
+export type CurrentUserResponseRole =
+  (typeof CurrentUserResponseRole)[keyof typeof CurrentUserResponseRole]
+
+export const CurrentUserResponseRole = {
+  ADMIN: 'ADMIN',
+  USER: 'USER',
+} as const
+
 export interface CurrentUserResponse {
-  id: string;
-  firstName: string;
-  lastName: string;
+  id: string
+  firstName: string
+  lastName: string
   /** @pattern ^(?!\.)(?!.*\.\.)([A-Za-z0-9_'+\-\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$ */
-  email: string;
+  email: string
   /** @nullable */
-  avatar?: string | null;
+  avatar?: string | null
+  role: CurrentUserResponseRole
+  workspaceId: string
   /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
-  createdAt: string;
+  createdAt: string
   /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
-  updatedAt: string;
+  updatedAt: string
+}
+
+export interface CurrentWorkspaceResponse {
+  id: string
+  name: string
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
+  createdAt: string
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
+  updatedAt: string
 }
 
 export interface LoginRequest {
   /** @pattern ^(?!\.)(?!.*\.\.)([A-Za-z0-9_'+\-\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$ */
-  email: string;
+  email: string
   /** @minLength 6 */
-  password: string;
+  password: string
 }
 
 export interface LoginResponse {
-  jwt: string;
+  jwt: string
 }
 
-export interface RegisterRequest {
+export type GetUsersByWorkspaceRequestSortOrder =
+  (typeof GetUsersByWorkspaceRequestSortOrder)[keyof typeof GetUsersByWorkspaceRequestSortOrder]
+
+export const GetUsersByWorkspaceRequestSortOrder = {
+  asc: 'asc',
+  desc: 'desc',
+} as const
+
+export type GetUsersByWorkspaceRequestWhereFirstName =
+  | { [key: string]: string }
+  | { [key: string]: number | null }
+  | { [key: string]: boolean }
+
+export type GetUsersByWorkspaceRequestWhereLastName =
+  | { [key: string]: string }
+  | { [key: string]: number | null }
+  | { [key: string]: boolean }
+
+export type GetUsersByWorkspaceRequestWhereEmail =
+  | { [key: string]: string }
+  | { [key: string]: number | null }
+  | { [key: string]: boolean }
+
+export type GetUsersByWorkspaceRequestWhereRole =
+  | { [key: string]: string }
+  | { [key: string]: number | null }
+  | { [key: string]: boolean }
+
+export type GetUsersByWorkspaceRequestWhere = {
+  firstName?: GetUsersByWorkspaceRequestWhereFirstName
+  lastName?: GetUsersByWorkspaceRequestWhereLastName
+  email?: GetUsersByWorkspaceRequestWhereEmail
+  role?: GetUsersByWorkspaceRequestWhereRole
+}
+
+export interface GetUsersByWorkspaceRequest {
+  /**
+   * @minimum 1
+   * @maximum 9007199254740991
+   */
+  page?: number
+  /**
+   * @minimum 1
+   * @maximum 20
+   */
+  limit?: number
+  sortBy?: string
+  sortOrder?: GetUsersByWorkspaceRequestSortOrder
+  where?: GetUsersByWorkspaceRequestWhere
+  /** @minLength 1 */
+  searchValue?: string
+}
+
+export type UserWorkspaceResponseRole =
+  (typeof UserWorkspaceResponseRole)[keyof typeof UserWorkspaceResponseRole]
+
+export const UserWorkspaceResponseRole = {
+  ADMIN: 'ADMIN',
+  USER: 'USER',
+} as const
+
+export interface UserWorkspaceResponse {
+  id: string
+  firstName: string
+  lastName: string
   /** @pattern ^(?!\.)(?!.*\.\.)([A-Za-z0-9_'+\-\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\-]*\.)+[A-Za-z]{2,}$ */
-  email: string;
-  /** @minLength 6 */
-  password: string;
+  email: string
+  /** @nullable */
+  avatar?: string | null
+  role: UserWorkspaceResponseRole
+  workspaceId: string
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
+  createdAt: string
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
+  updatedAt: string
+}
+
+export interface MutationResponse {
+  message: string
+}
+
+export type GetMyCategoriesRequestSortOrder =
+  (typeof GetMyCategoriesRequestSortOrder)[keyof typeof GetMyCategoriesRequestSortOrder]
+
+export const GetMyCategoriesRequestSortOrder = {
+  asc: 'asc',
+  desc: 'desc',
+} as const
+
+export type GetMyCategoriesRequestWhereName =
+  | { [key: string]: string }
+  | { [key: string]: number | null }
+  | { [key: string]: boolean }
+
+export type GetMyCategoriesRequestWhere = {
+  name?: GetMyCategoriesRequestWhereName
+}
+
+export interface GetMyCategoriesRequest {
+  /**
+   * @minimum 1
+   * @maximum 9007199254740991
+   */
+  page?: number
+  /**
+   * @minimum 1
+   * @maximum 20
+   */
+  limit?: number
+  sortBy?: string
+  sortOrder?: GetMyCategoriesRequestSortOrder
+  where?: GetMyCategoriesRequestWhere
   /** @minLength 1 */
-  firstName: string;
+  searchValue?: string
+}
+
+export type GetCategoriesResponseAssignedUsersItem = {
+  id: string
+  firstName: string
+  lastName: string
+  /** @nullable */
+  avatar?: string | null
+}
+
+export interface GetCategoriesResponse {
+  id: string
+  name: string
+  workspaceId: string
+  assignedUsers: GetCategoriesResponseAssignedUsersItem[]
+  /**
+   * @minimum 0
+   * @maximum 9007199254740991
+   */
+  assignedUsersCount: number
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
+  createdAt: string
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
+  updatedAt: string
+}
+
+export type GetWorkspaceCategoriesRequestSortOrder =
+  (typeof GetWorkspaceCategoriesRequestSortOrder)[keyof typeof GetWorkspaceCategoriesRequestSortOrder]
+
+export const GetWorkspaceCategoriesRequestSortOrder = {
+  asc: 'asc',
+  desc: 'desc',
+} as const
+
+export type GetWorkspaceCategoriesRequestWhereName =
+  | { [key: string]: string }
+  | { [key: string]: number | null }
+  | { [key: string]: boolean }
+
+export type GetWorkspaceCategoriesRequestWhere = {
+  name?: GetWorkspaceCategoriesRequestWhereName
+}
+
+export interface GetWorkspaceCategoriesRequest {
+  /**
+   * @minimum 1
+   * @maximum 9007199254740991
+   */
+  page?: number
+  /**
+   * @minimum 1
+   * @maximum 20
+   */
+  limit?: number
+  sortBy?: string
+  sortOrder?: GetWorkspaceCategoriesRequestSortOrder
+  where?: GetWorkspaceCategoriesRequestWhere
+}
+
+export interface AssignUsersToCategoryRequest {
+  userIds: string[]
+}
+
+export interface GetCategoryStatsRequest {
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
+  startDate: string
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
+  endDate: string
+}
+
+export type CategoryStatsResponseReceiptsByNameItem = {
+  name: string
+  totalAmount: number
+  percentage: number
+}
+
+export interface CategoryStatsResponse {
+  categoryId: string
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
+  startDate: string
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
+  endDate: string
+  totalReceiptAmount: number
+  /**
+   * @minimum 0
+   * @maximum 9007199254740991
+   */
+  totalRoutes: number
+  totalKm: number
+  totalFuel: number
+  receiptsByName: CategoryStatsResponseReceiptsByNameItem[]
+}
+
+export type GetCategoryByIdResponseAssignedUsersItem = {
+  id: string
+  firstName: string
+  lastName: string
+  /** @nullable */
+  avatar?: string | null
+}
+
+export interface GetCategoryByIdResponse {
+  id: string
+  name: string
+  workspaceId: string
+  assignedUsers: GetCategoryByIdResponseAssignedUsersItem[]
+  /**
+   * @minimum 0
+   * @maximum 9007199254740991
+   */
+  assignedUsersCount: number
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
+  createdAt: string
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
+  updatedAt: string
+}
+
+export interface CreateCategoryRequest {
   /** @minLength 1 */
-  lastName: string;
+  name: string
+}
+
+export interface CreateCarRequest {
   /** @minLength 1 */
-  workspaceId?: string;
+  name: string
   /** @minLength 1 */
-  workspaceName?: string;
+  plateNumber: string
+  /** @exclusiveMinimum 0 */
+  consumtion: number
+}
+
+export type GetCarsByWorkspaceRequestSortOrder =
+  (typeof GetCarsByWorkspaceRequestSortOrder)[keyof typeof GetCarsByWorkspaceRequestSortOrder]
+
+export const GetCarsByWorkspaceRequestSortOrder = {
+  asc: 'asc',
+  desc: 'desc',
+} as const
+
+export type GetCarsByWorkspaceRequestWhereName =
+  | { [key: string]: string }
+  | { [key: string]: number | null }
+  | { [key: string]: boolean }
+
+export type GetCarsByWorkspaceRequestWherePlateNumber =
+  | { [key: string]: string }
+  | { [key: string]: number | null }
+  | { [key: string]: boolean }
+
+export type GetCarsByWorkspaceRequestWhereConsumtion =
+  | { [key: string]: string }
+  | { [key: string]: number | null }
+  | { [key: string]: boolean }
+
+export type GetCarsByWorkspaceRequestWhere = {
+  name?: GetCarsByWorkspaceRequestWhereName
+  plateNumber?: GetCarsByWorkspaceRequestWherePlateNumber
+  consumtion?: GetCarsByWorkspaceRequestWhereConsumtion
+}
+
+export interface GetCarsByWorkspaceRequest {
+  /**
+   * @minimum 1
+   * @maximum 9007199254740991
+   */
+  page?: number
+  /**
+   * @minimum 1
+   * @maximum 20
+   */
+  limit?: number
+  sortBy?: string
+  sortOrder?: GetCarsByWorkspaceRequestSortOrder
+  where?: GetCarsByWorkspaceRequestWhere
+  searchValue?: string
+}
+
+export interface CarWorkspaceResponse {
+  id: string
+  name: string
+  plateNumber: string
+  consumtion: number
+  workspaceId: string
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
+  createdAt: string
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
+  updatedAt: string
+}
+
+export interface GetWorkspaceCarsTotalKmRequest {
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
+  startDate: string
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
+  endDate: string
+  /** @minLength 1 */
+  categoryId: string
+}
+
+export interface WorkspaceCarTotalKmResponse {
+  id: string
+  name: string
+  plateNumber: string
+  consumtion: number
+  totalKm: number
+  averageLiterConsumed: number
+}
+
+export type CreateRouteRequestRouteItemsItem = {
+  /** @minLength 1 */
+  name: string
+  /**
+   * @minimum 0
+   * @maximum 9007199254740991
+   */
+  order: number
+}
+
+export interface CreateRouteRequest {
+  /** @minimum 0 */
+  startKm: number
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
+  date: string
+  /** @minLength 1 */
+  carId: string
+  /** @minLength 1 */
+  categoryId: string
+  routeItems?: CreateRouteRequestRouteItemsItem[]
+}
+
+export type GetMyRoutesRequestSortOrder =
+  (typeof GetMyRoutesRequestSortOrder)[keyof typeof GetMyRoutesRequestSortOrder]
+
+export const GetMyRoutesRequestSortOrder = {
+  asc: 'asc',
+  desc: 'desc',
+} as const
+
+export type GetMyRoutesRequestWhereUserId =
+  | { [key: string]: string }
+  | { [key: string]: number | null }
+  | { [key: string]: boolean }
+
+export type GetMyRoutesRequestWhereCarId =
+  | { [key: string]: string }
+  | { [key: string]: number | null }
+  | { [key: string]: boolean }
+
+export type GetMyRoutesRequestWhereCategoryId =
+  | { [key: string]: string }
+  | { [key: string]: number | null }
+  | { [key: string]: boolean }
+
+export type GetMyRoutesRequestWhereStartKm =
+  | { [key: string]: string }
+  | { [key: string]: number | null }
+  | { [key: string]: boolean }
+
+export type GetMyRoutesRequestWhereEndKm =
+  | { [key: string]: string }
+  | { [key: string]: number | null }
+  | { [key: string]: boolean }
+
+export type GetMyRoutesRequestWhereDate =
+  | { [key: string]: string }
+  | { [key: string]: number | null }
+  | { [key: string]: boolean }
+
+export type GetMyRoutesRequestWhere = {
+  userId?: GetMyRoutesRequestWhereUserId
+  carId?: GetMyRoutesRequestWhereCarId
+  categoryId?: GetMyRoutesRequestWhereCategoryId
+  startKm?: GetMyRoutesRequestWhereStartKm
+  endKm?: GetMyRoutesRequestWhereEndKm
+  date?: GetMyRoutesRequestWhereDate
+}
+
+export interface GetMyRoutesRequest {
+  /**
+   * @minimum 1
+   * @maximum 9007199254740991
+   */
+  page?: number
+  /**
+   * @minimum 1
+   * @maximum 20
+   */
+  limit?: number
+  sortBy?: string
+  sortOrder?: GetMyRoutesRequestSortOrder
+  where?: GetMyRoutesRequestWhere
+}
+
+export type GetMyRoutesResponseCar = {
+  id: string
+  name: string
+  plateNumber: string
+  consumtion: number
+  workspaceId: string
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
+  createdAt: string
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
+  updatedAt: string
+}
+
+export type GetMyRoutesResponseRouteItemsItem = {
+  id: string
+  name: string
+  /**
+   * @minimum -9007199254740991
+   * @maximum 9007199254740991
+   */
+  order: number
+  routeId: string
+  workspaceId: string
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
+  createdAt: string
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
+  updatedAt: string
+}
+
+export interface GetMyRoutesResponse {
+  id: string
+  startKm: number
+  /** @nullable */
+  endKm: number | null
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
+  date: string
+  carId: string
+  car: GetMyRoutesResponseCar
+  workspaceId: string
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
+  createdAt: string
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
+  updatedAt: string
+  routeItems: GetMyRoutesResponseRouteItemsItem[]
+}
+
+export type GetRoutesByWorkspaceRequestSortOrder =
+  (typeof GetRoutesByWorkspaceRequestSortOrder)[keyof typeof GetRoutesByWorkspaceRequestSortOrder]
+
+export const GetRoutesByWorkspaceRequestSortOrder = {
+  asc: 'asc',
+  desc: 'desc',
+} as const
+
+export type GetRoutesByWorkspaceRequestWhereUserId =
+  | { [key: string]: string }
+  | { [key: string]: number | null }
+  | { [key: string]: boolean }
+
+export type GetRoutesByWorkspaceRequestWhereCarId =
+  | { [key: string]: string }
+  | { [key: string]: number | null }
+  | { [key: string]: boolean }
+
+export type GetRoutesByWorkspaceRequestWhereCategoryId =
+  | { [key: string]: string }
+  | { [key: string]: number | null }
+  | { [key: string]: boolean }
+
+export type GetRoutesByWorkspaceRequestWhereStartKm =
+  | { [key: string]: string }
+  | { [key: string]: number | null }
+  | { [key: string]: boolean }
+
+export type GetRoutesByWorkspaceRequestWhereEndKm =
+  | { [key: string]: string }
+  | { [key: string]: number | null }
+  | { [key: string]: boolean }
+
+export type GetRoutesByWorkspaceRequestWhereDate =
+  | { [key: string]: string }
+  | { [key: string]: number | null }
+  | { [key: string]: boolean }
+
+export type GetRoutesByWorkspaceRequestWhere = {
+  userId?: GetRoutesByWorkspaceRequestWhereUserId
+  carId?: GetRoutesByWorkspaceRequestWhereCarId
+  categoryId?: GetRoutesByWorkspaceRequestWhereCategoryId
+  startKm?: GetRoutesByWorkspaceRequestWhereStartKm
+  endKm?: GetRoutesByWorkspaceRequestWhereEndKm
+  date?: GetRoutesByWorkspaceRequestWhereDate
+}
+
+export interface GetRoutesByWorkspaceRequest {
+  /**
+   * @minimum 1
+   * @maximum 9007199254740991
+   */
+  page?: number
+  /**
+   * @minimum 1
+   * @maximum 20
+   */
+  limit?: number
+  sortBy?: string
+  sortOrder?: GetRoutesByWorkspaceRequestSortOrder
+  where?: GetRoutesByWorkspaceRequestWhere
+}
+
+export type RouteWorkspaceResponseCar = {
+  id: string
+  name: string
+  plateNumber: string
+  consumtion: number
+  workspaceId: string
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
+  createdAt: string
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
+  updatedAt: string
+}
+
+export type RouteWorkspaceResponseRouteItemsItem = {
+  id: string
+  name: string
+  /**
+   * @minimum -9007199254740991
+   * @maximum 9007199254740991
+   */
+  order: number
+  routeId: string
+  workspaceId: string
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
+  createdAt: string
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
+  updatedAt: string
+}
+
+export interface RouteWorkspaceResponse {
+  id: string
+  startKm: number
+  /** @nullable */
+  endKm: number | null
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
+  date: string
+  carId: string
+  car: RouteWorkspaceResponseCar
+  workspaceId: string
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
+  createdAt: string
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
+  updatedAt: string
+  routeItems: RouteWorkspaceResponseRouteItemsItem[]
+  userId: string
+  firstName: string
+  lastName: string
+  /** @nullable */
+  avatar?: string | null
+}
+
+export interface UpdateRouteEndKmRequest {
+  /** @minimum 0 */
+  endKm: number
+}
+
+export type GetReceiptsByWorkspaceRequestSortOrder =
+  (typeof GetReceiptsByWorkspaceRequestSortOrder)[keyof typeof GetReceiptsByWorkspaceRequestSortOrder]
+
+export const GetReceiptsByWorkspaceRequestSortOrder = {
+  asc: 'asc',
+  desc: 'desc',
+} as const
+
+export type GetReceiptsByWorkspaceRequestWhereUserId =
+  | { [key: string]: string }
+  | { [key: string]: number | null }
+  | { [key: string]: boolean }
+
+export type GetReceiptsByWorkspaceRequestWhereCategoryId =
+  | { [key: string]: string }
+  | { [key: string]: number | null }
+  | { [key: string]: boolean }
+
+export type GetReceiptsByWorkspaceRequestWhereAmount =
+  | { [key: string]: string }
+  | { [key: string]: number | null }
+  | { [key: string]: boolean }
+
+export type GetReceiptsByWorkspaceRequestWherePlace =
+  | { [key: string]: string }
+  | { [key: string]: number | null }
+  | { [key: string]: boolean }
+
+export type GetReceiptsByWorkspaceRequestWhereDate =
+  | { [key: string]: string }
+  | { [key: string]: number | null }
+  | { [key: string]: boolean }
+
+export type GetReceiptsByWorkspaceRequestWhere = {
+  userId?: GetReceiptsByWorkspaceRequestWhereUserId
+  categoryId?: GetReceiptsByWorkspaceRequestWhereCategoryId
+  amount?: GetReceiptsByWorkspaceRequestWhereAmount
+  place?: GetReceiptsByWorkspaceRequestWherePlace
+  date?: GetReceiptsByWorkspaceRequestWhereDate
+}
+
+export interface GetReceiptsByWorkspaceRequest {
+  /**
+   * @minimum 1
+   * @maximum 9007199254740991
+   */
+  page?: number
+  /**
+   * @minimum 1
+   * @maximum 20
+   */
+  limit?: number
+  sortBy?: string
+  sortOrder?: GetReceiptsByWorkspaceRequestSortOrder
+  where?: GetReceiptsByWorkspaceRequestWhere
+}
+
+export interface ReceiptWorkspaceResponse {
+  id: string
+  url: string
+  amount: number
+  place: string
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
+  date: string
+  categoryId: string
+  workspaceId: string
+  userId: string
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
+  createdAt: string
+  /** @pattern ^(?:(?:\d\d[2468][048]|\d\d[13579][26]|\d\d0[48]|[02468][048]00|[13579][26]00)-02-29|\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\d|30)|(?:02)-(?:0[1-9]|1\d|2[0-8])))T(?:(?:[01]\d|2[0-3]):[0-5]\d(?::[0-5]\d(?:\.\d+)?)?(?:Z))$ */
+  updatedAt: string
+}
+
+export interface WorkspacePublicResponse {
+  id: string
+  name: string
 }
 
 export type HealthCheckControllerGetHealth200Status =
-  (typeof HealthCheckControllerGetHealth200Status)[keyof typeof HealthCheckControllerGetHealth200Status];
+  (typeof HealthCheckControllerGetHealth200Status)[keyof typeof HealthCheckControllerGetHealth200Status]
 
 export const HealthCheckControllerGetHealth200Status = {
-  healthy: "healthy",
-  unhealthy: "unhealthy",
-} as const;
+  healthy: 'healthy',
+  unhealthy: 'unhealthy',
+} as const
 
 export type HealthCheckControllerGetHealth200ServicesDatabaseStatus =
-  (typeof HealthCheckControllerGetHealth200ServicesDatabaseStatus)[keyof typeof HealthCheckControllerGetHealth200ServicesDatabaseStatus];
+  (typeof HealthCheckControllerGetHealth200ServicesDatabaseStatus)[keyof typeof HealthCheckControllerGetHealth200ServicesDatabaseStatus]
 
 export const HealthCheckControllerGetHealth200ServicesDatabaseStatus = {
-  healthy: "healthy",
-  unhealthy: "unhealthy",
-} as const;
+  healthy: 'healthy',
+  unhealthy: 'unhealthy',
+} as const
 
 export type HealthCheckControllerGetHealth200ServicesDatabase = {
-  status?: HealthCheckControllerGetHealth200ServicesDatabaseStatus;
+  status?: HealthCheckControllerGetHealth200ServicesDatabaseStatus
   /** Response time in milliseconds */
-  responseTime?: number;
+  responseTime?: number
   /** Error message if unhealthy */
-  error?: string;
-};
+  error?: string
+}
 
 export type HealthCheckControllerGetHealth200ServicesRedisStatus =
-  (typeof HealthCheckControllerGetHealth200ServicesRedisStatus)[keyof typeof HealthCheckControllerGetHealth200ServicesRedisStatus];
+  (typeof HealthCheckControllerGetHealth200ServicesRedisStatus)[keyof typeof HealthCheckControllerGetHealth200ServicesRedisStatus]
 
 export const HealthCheckControllerGetHealth200ServicesRedisStatus = {
-  healthy: "healthy",
-  unhealthy: "unhealthy",
-} as const;
+  healthy: 'healthy',
+  unhealthy: 'unhealthy',
+} as const
 
 export type HealthCheckControllerGetHealth200ServicesRedis = {
-  status?: HealthCheckControllerGetHealth200ServicesRedisStatus;
+  status?: HealthCheckControllerGetHealth200ServicesRedisStatus
   /** Response time in milliseconds */
-  responseTime?: number;
+  responseTime?: number
   /** Error message if unhealthy */
-  error?: string;
-};
+  error?: string
+}
 
 export type HealthCheckControllerGetHealth200Services = {
-  database?: HealthCheckControllerGetHealth200ServicesDatabase;
-  redis?: HealthCheckControllerGetHealth200ServicesRedis;
-};
+  database?: HealthCheckControllerGetHealth200ServicesDatabase
+  redis?: HealthCheckControllerGetHealth200ServicesRedis
+}
 
 export type HealthCheckControllerGetHealth200 = {
-  status?: HealthCheckControllerGetHealth200Status;
-  timestamp?: string;
+  status?: HealthCheckControllerGetHealth200Status
+  timestamp?: string
   /** Uptime in seconds */
-  uptime?: number;
-  services?: HealthCheckControllerGetHealth200Services;
-};
+  uptime?: number
+  services?: HealthCheckControllerGetHealth200Services
+}
+
+export type AuthControllerGetCurrentWorkspaceHeaders = {
+  /**
+   * Workspace ID associated with the authenticated user
+   */
+  'workspace-id': string
+}
+
+export type AuthControllerRegisterBody = {
+  email: string
+  password: string
+  firstName: string
+  lastName: string
+  workspaceId?: string
+  workspaceName?: string
+  /** Optional avatar image (jpg, jpeg, png, webp) */
+  avatar?: Blob
+}
+
+export type UserControllerGetWorkspaceUsersHeaders = {
+  /**
+   * Workspace ID associated with the authenticated user
+   */
+  'workspace-id': string
+}
+
+export type UserControllerDeleteUserHeaders = {
+  /**
+   * Workspace ID associated with the authenticated user
+   */
+  'workspace-id': string
+}
+
+export type CategoryControllerGetMyCategoriesHeaders = {
+  /**
+   * Workspace ID associated with the authenticated user
+   */
+  'workspace-id': string
+}
+
+export type CategoryControllerGetWorkspaceCategoriesHeaders = {
+  /**
+   * Workspace ID associated with the authenticated user
+   */
+  'workspace-id': string
+}
+
+export type CategoryControllerAssignUsersToCategoryHeaders = {
+  /**
+   * Workspace ID associated with the authenticated user
+   */
+  'workspace-id': string
+}
+
+export type CategoryControllerGetCategoryStatsHeaders = {
+  /**
+   * Workspace ID associated with the authenticated user
+   */
+  'workspace-id': string
+}
+
+export type CategoryControllerGetCategoryByIdHeaders = {
+  /**
+   * Workspace ID associated with the authenticated user
+   */
+  'workspace-id': string
+}
+
+export type CategoryControllerCreateCategoryHeaders = {
+  /**
+   * Workspace ID associated with the authenticated user
+   */
+  'workspace-id': string
+}
+
+export type CarControllerCreateCarHeaders = {
+  /**
+   * Workspace ID associated with the authenticated user
+   */
+  'workspace-id': string
+}
+
+export type CarControllerGetWorkspaceCarsHeaders = {
+  /**
+   * Workspace ID associated with the authenticated user
+   */
+  'workspace-id': string
+}
+
+export type CarControllerGetWorkspaceCarsTotalKmHeaders = {
+  /**
+   * Workspace ID associated with the authenticated user
+   */
+  'workspace-id': string
+}
+
+export type RouteControllerCreateRouteHeaders = {
+  /**
+   * Workspace ID associated with the authenticated user
+   */
+  'workspace-id': string
+}
+
+export type RouteControllerGetMyRoutesHeaders = {
+  /**
+   * Workspace ID associated with the authenticated user
+   */
+  'workspace-id': string
+}
+
+export type RouteControllerGetWorkspaceRoutesHeaders = {
+  /**
+   * Workspace ID associated with the authenticated user
+   */
+  'workspace-id': string
+}
+
+export type RouteControllerUpdateRouteEndKmHeaders = {
+  /**
+   * Workspace ID associated with the authenticated user
+   */
+  'workspace-id': string
+}
+
+export type ReceiptControllerAddRecipeHeaders = {
+  /**
+   * Workspace ID associated with the authenticated user
+   */
+  'workspace-id': string
+}
+
+export type ReceiptControllerAddRecipeBody = {
+  /** Recipe file to upload */
+  file: Blob
+  amount: number
+  place: string
+  date: string
+  categoryId: string
+}
+
+export type ReceiptControllerGetWorkspaceReceiptsHeaders = {
+  /**
+   * Workspace ID associated with the authenticated user
+   */
+  'workspace-id': string
+}
+
+export type ReceiptControllerGetReceiptBlobHeaders = {
+  /**
+   * Workspace ID associated with the authenticated user
+   */
+  'workspace-id': string
+}

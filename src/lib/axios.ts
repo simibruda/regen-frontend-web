@@ -16,6 +16,10 @@ export const customInstance = <T>(
   const promise = AXIOS_INSTANCE({
     ...config,
     ...options,
+    headers: {
+      ...(config.headers ?? {}),
+      ...(options?.headers ?? {}),
+    },
     cancelToken: source.token,
   }).then(({ data }) => data) as PromiseWithCancel<T>
 

@@ -1,6 +1,17 @@
+import { apiOptions } from '@/common/api'
+import { ROUTES_PAGE_LIMIT } from '@/common/api/route/route.queries'
 import { Button } from '@/common/components/_base/button'
-import { cars } from '@/common/mocks/cars'
-import type { WorkspaceRoute } from '@/common/mocks/routes'
+import { Loader } from '@/common/components/_base/loader'
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/common/components/_base/pagination'
+import { useQuery } from '@tanstack/react-query'
+import { useParams } from '@tanstack/react-router'
 import {
   flexRender,
   getCoreRowModel,
@@ -8,44 +19,95 @@ import {
   type ColumnDef,
   type Row,
 } from '@tanstack/react-table'
+import dayjs from 'dayjs'
 import { ArrowRight, ChevronDown, ChevronUp, MapPin } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
 export type RouteTableRow = {
   id: string
-  carName: string
-  plateNumber: string
+  userAvatarUrl: string | null
   userFirstName: string
   userLastName: string
+  userDisplayName: string
+  carName: string
+  plateNumber: string
+  date: string
   startKm: number
-  endKm: number
-  routeKm: number
+  endKm: number | null
+  routeKm: number | null
   stops: { order: number; name: string }[]
 }
 
-type RoutesTableSectionProps = {
-  routes: WorkspaceRoute[]
+function routePointLabel(index: number) {
+  if (index === 0) return 'Starting point'
+  return `Stop ${index}`
 }
 
-export function RoutesTableSection({ routes }: RoutesTableSectionProps) {
+function userInitials(firstName: string, lastName: string) {
+  const a = firstName.trim().charAt(0)
+  const b = lastName.trim().charAt(0)
+  if (a && b) return `${a}${b}`.toUpperCase()
+  if (a) return a.toUpperCase()
+  if (b) return b.toUpperCase()
+  return '?'
+}
+
+type RoutesTableSectionProps = {
+  startDate: string
+  endDate: string
+}
+
+export function RoutesTableSection({
+  startDate,
+  endDate,
+}: RoutesTableSectionProps) {
+  const { id: categoryId } = useParams({ from: '/_auth-guard/category/$id' })
+  const { data: currentUser } = useQuery({
+    ...apiOptions.queries.getCurrentUser,
+  })
+  const workspaceId = currentUser?.workspaceId ?? ''
+  const enabled = Boolean(workspaceId && categoryId)
+
+  const [currentPage, setCurrentPage] = useState(1)
   const [expandedRoutes, setExpandedRoutes] = useState<Record<string, boolean>>({})
+
+  const { data: workspaceRoutes = [], isLoading: isRoutesLoading } = useQuery({
+    ...apiOptions.queries.getWorkspaceRoutes(workspaceId, startDate, endDate, currentPage),
+    enabled,
+  })
+
+  const { data: cars = [], isLoading: isCarsLoading } = useQuery({
+    ...apiOptions.queries.getWorkspaceCarsTotalKm(workspaceId, categoryId, startDate, endDate),
+    enabled,
+  })
+
+  const hasNextPage = workspaceRoutes.length === ROUTES_PAGE_LIMIT
+  const isLoading = isRoutesLoading || isCarsLoading
+
+  const carsById = useMemo(() => new Map(cars.map((car) => [car.id, car])), [cars])
   const routeRows = useMemo<RouteTableRow[]>(
     () =>
-      routes.map((route) => {
-        const car = cars.find((item) => item.id === route.carId)
+      workspaceRoutes.map((route) => {
+        const car = carsById.get(route.carId)
+        const endKm = route.endKm
         return {
           id: route.id,
+          userAvatarUrl: route.avatar ?? null,
+          userFirstName: route.firstName,
+          userLastName: route.lastName,
+          userDisplayName: `${route.firstName} ${route.lastName}`.trim() || '—',
           carName: car?.name ?? 'Unknown',
           plateNumber: car?.plateNumber ?? 'N/A',
-          userFirstName: route.userFirstName,
-          userLastName: route.userLastName,
+          date: route.date,
           startKm: route.startKm,
-          endKm: route.endKm,
-          routeKm: route.endKm - route.startKm,
-          stops: route.stops,
+          endKm,
+          routeKm: endKm === null ? null : endKm - route.startKm,
+          stops: [...route.routeItems]
+            .sort((a, b) => a.order - b.order)
+            .map((item) => ({ order: item.order, name: item.name })),
         }
       }),
-    [routes],
+    [carsById, workspaceRoutes]
   )
 
   const routeColumns = useMemo<ColumnDef<RouteTableRow>[]>(
@@ -57,7 +119,7 @@ export function RoutesTableSection({ routes }: RoutesTableSectionProps) {
           <Button
             size="icon"
             variant="ghost"
-            className="h-8 w-8 rounded-md text-primary hover:bg-secondary"
+            className="h-8 w-8 shrink-0 rounded-md text-primary hover:bg-secondary"
             onClick={() =>
               setExpandedRoutes((prev) => ({ ...prev, [row.original.id]: !prev[row.original.id] }))
             }
@@ -70,15 +132,55 @@ export function RoutesTableSection({ routes }: RoutesTableSectionProps) {
           </Button>
         ),
       },
+      {
+        header: 'User',
+        id: 'user',
+        accessorKey: 'userDisplayName',
+        cell: ({ row }) => {
+          const { userAvatarUrl, userDisplayName } = row.original
+          return (
+            <div className="flex min-w-0 max-w-[220px] items-center gap-2 sm:max-w-xs">
+              {userAvatarUrl ? (
+                <img
+                  src={userAvatarUrl}
+                  alt=""
+                  className="h-8 w-8 shrink-0 rounded-full object-cover"
+                />
+              ) : (
+                <div
+                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/15 text-xs font-semibold text-primary"
+                  title={userDisplayName}
+                >
+                  {userInitials(row.original.userFirstName, row.original.userLastName)}
+                </div>
+              )}
+              <span className="min-w-0 truncate font-medium text-foreground" title={userDisplayName}>
+                {userDisplayName}
+              </span>
+            </div>
+          )
+        },
+      },
       { header: 'Car Name', accessorKey: 'carName' },
       { header: 'Plate Number', accessorKey: 'plateNumber' },
-      { header: 'First Name', accessorKey: 'userFirstName' },
-      { header: 'Last Name', accessorKey: 'userLastName' },
+      {
+        header: 'Date',
+        accessorKey: 'date',
+        cell: ({ row }) => dayjs(row.original.date).format('DD.MM.YYYY'),
+      },
       { header: 'Start KM', accessorKey: 'startKm' },
-      { header: 'End KM', accessorKey: 'endKm' },
-      { header: 'Route KM', accessorKey: 'routeKm' },
+      {
+        header: 'End KM',
+        accessorKey: 'endKm',
+        cell: ({ row }) => (row.original.endKm ?? '-'),
+      },
+      {
+        header: 'Route KM',
+        accessorKey: 'routeKm',
+        cell: ({ row }) => (row.original.routeKm ?? '-'),
+      },
     ],
-    [expandedRoutes],
+    [expandedRoutes]
   )
 
   const routeTable = useReactTable({
@@ -90,49 +192,85 @@ export function RoutesTableSection({ routes }: RoutesTableSectionProps) {
   const columnCount = routeTable.getAllLeafColumns().length
 
   return (
-    <section className="space-y-3">
-      <div className="flex items-center gap-2">
-        <MapPin className="h-5 w-5 text-primary" />
-        <h2 className="text-lg font-semibold text-foreground">Routes</h2>
-      </div>
-      <p className="mt-0.5 pl-7 text-sm text-muted-foreground">
-        Expand a route row to see each stop order and name.
+    <section className="space-y-4">
+      <p className="text-sm text-muted-foreground">
+        <MapPin className="me-1.5 inline h-4 w-4 align-text-bottom text-primary" />
+        Expand a row to see stops in order.
       </p>
-      <div className="mt-4 overflow-x-auto">
-        <table className="min-w-full border-separate border-spacing-0 overflow-hidden rounded-xl border border-border text-sm">
-          <thead className="bg-secondary text-left text-xs uppercase tracking-wide text-muted-foreground">
-            {routeTable.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <th key={header.id} className="border-b border-border px-3 py-2.5 font-semibold">
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(header.column.columnDef.header, header.getContext())}
-                  </th>
+      {isLoading ? (
+        <div className="py-10">
+          <Loader />
+        </div>
+      ) : (
+        <div className="space-y-4">
+          <div className="overflow-x-auto">
+            <table className="min-w-full border-separate border-spacing-0 overflow-hidden rounded-xl border border-border text-sm">
+              <thead className="bg-secondary text-left text-xs uppercase tracking-wide text-muted-foreground">
+                {routeTable.getHeaderGroups().map((headerGroup) => (
+                  <tr key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <th key={header.id} className="border-b border-border px-3 py-2.5 font-semibold">
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(header.column.columnDef.header, header.getContext())}
+                      </th>
+                    ))}
+                  </tr>
                 ))}
-              </tr>
-            ))}
-          </thead>
-          <tbody>
-            {routeTable.getRowModel().rows.length === 0 ? (
-              <tr>
-                <td colSpan={columnCount} className="px-3 py-8 text-center text-muted-foreground">
-                  No routes for selected date range.
-                </td>
-              </tr>
-            ) : (
-              routeTable.getRowModel().rows.map((row) => (
-                <ExpandableRouteRow
-                  key={row.id}
-                  row={row}
-                  isExpanded={!!expandedRoutes[row.original.id]}
-                  columnCount={columnCount}
+              </thead>
+              <tbody>
+                {routeTable.getRowModel().rows.length === 0 ? (
+                  <tr>
+                    <td colSpan={columnCount} className="px-3 py-8 text-center text-muted-foreground">
+                      No routes for selected date range.
+                    </td>
+                  </tr>
+                ) : (
+                  routeTable.getRowModel().rows.map((row) => (
+                    <ExpandableRouteRow
+                      key={row.id}
+                      row={row}
+                      isExpanded={!!expandedRoutes[row.original.id]}
+                      columnCount={columnCount}
+                    />
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+          <Pagination>
+            <PaginationContent>
+              <PaginationItem>
+                <PaginationPrevious
+                  href="#"
+                  onClick={(event) => {
+                    event.preventDefault()
+                    if (currentPage <= 1) return
+                    setCurrentPage((page) => page - 1)
+                  }}
+                  className={currentPage <= 1 ? 'pointer-events-none opacity-50' : undefined}
                 />
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationLink href="#" isActive onClick={(event) => event.preventDefault()}>
+                  {currentPage}
+                </PaginationLink>
+              </PaginationItem>
+              <PaginationItem>
+                <PaginationNext
+                  href="#"
+                  onClick={(event) => {
+                    event.preventDefault()
+                    if (!hasNextPage) return
+                    setCurrentPage((page) => page + 1)
+                  }}
+                  className={!hasNextPage ? 'pointer-events-none opacity-50' : undefined}
+                />
+              </PaginationItem>
+            </PaginationContent>
+          </Pagination>
+        </div>
+      )}
     </section>
   )
 }
@@ -166,10 +304,15 @@ function ExpandableRouteRow({
                 {row.original.stops.map((stop, index) => (
                   <div key={`${row.original.id}-${stop.order}`} className="flex items-center gap-2">
                     <div className="group flex items-center gap-2 rounded-lg px-3 py-2 transition-all hover:-translate-y-0.5">
-                      <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/15 text-xs font-semibold text-primary">
-                        {stop.order}
+                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/15 text-xs font-semibold text-primary">
+                        {index === 0 ? 'S' : index}
                       </span>
-                      <span className="text-sm font-medium text-foreground">{stop.name}</span>
+                      <span className="flex min-w-0 flex-col gap-0.5">
+                        <span className="text-[10px] font-semibold uppercase tracking-wide text-muted-foreground">
+                          {routePointLabel(index)}
+                        </span>
+                        <span className="text-sm font-medium text-foreground">{stop.name}</span>
+                      </span>
                     </div>
                     {index < row.original.stops.length - 1 && (
                       <ArrowRight className="h-4 w-4 text-primary/70" aria-hidden />

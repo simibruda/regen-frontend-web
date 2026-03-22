@@ -1,4 +1,5 @@
-import { Home, Users, Car, Settings, type LucideIcon } from 'lucide-react'
+import { CurrentUserResponseRole } from '@/common/api/_base/api-types.schemas'
+import { Car, Home, Settings, Users, type LucideIcon } from 'lucide-react'
 
 export type NavItem = {
   title: string
@@ -8,11 +9,14 @@ export type NavItem = {
 
 export const managerNavigation: NavItem[] = [
   { title: 'Home', to: '/', icon: Home },
-  { title: 'Categories', to: '/categories', icon: Settings },
+  { title: 'Categories', to: '/categories-config', icon: Settings },
   { title: 'Cars', to: '/cars', icon: Car },
   { title: 'Users', to: '/users', icon: Users },
 ]
 
-export const userNavigation: NavItem[] = [
-  { title: 'Home', to: '/', icon: Home },
-]
+export const userNavigation: NavItem[] = [{ title: 'Home', to: '/', icon: Home }]
+
+export const navigationList = {
+  [CurrentUserResponseRole.ADMIN]: managerNavigation,
+  [CurrentUserResponseRole.USER]: userNavigation,
+}
