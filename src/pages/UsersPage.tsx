@@ -24,7 +24,12 @@ export function UsersPage() {
 		handleAddDialogOpenChange,
 		handleDeleteUser,
 		handleAddUser,
+		isLoading,
 	} = useUsersPage()
+
+	if (isLoading) {
+		return <div className="flex h-full items-center justify-center">Loading users...</div>
+	}
 
 	return (
 		<main className="min-h-full bg-background p-4 pb-36 md:p-5 md:pb-5">

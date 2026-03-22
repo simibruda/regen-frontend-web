@@ -1,100 +1,73 @@
+import { useCreateUser, useDeleteUser } from '@/common/api/user/user.mutations'
+import { useUsers } from '@/common/api/user/user.query'
 import { categories } from '@/common/mocks/categories'
 import type { AddUserFormValues } from '@/features/workspace/components/user-manager/add-user-modal/useAddUserModal'
-import type { UserRole, UserRow } from '@/pages/UsersPage'
+import type { UserRow } from '@/pages/UsersPage'
 import { useMemo, useState } from 'react'
 
-const roleByUserId: Partial<Record<string, UserRole>> = {
-  p1: 'Manager',
-  p4: 'Coordinator',
-  p6: 'Coordinator',
-}
+const workspaceId = 'workspace-1' // Hardcoded for now
 
 type CategoryOption = {
-  id: string
-  name: string
-}
-
-function sortUsers(a: UserRow, b: UserRow) {
-  const lastNameCompare = a.lastName.localeCompare(b.lastName)
-  if (lastNameCompare !== 0) return lastNameCompare
-  return a.firstName.localeCompare(b.firstName)
-}
-
-function buildInitialUsers(): UserRow[] {
-  const usersMap = new Map<string, UserRow>()
-
-  categories.forEach((category) => {
-    category.assignedPeople.forEach((person) => {
-      const [first, ...lastParts] = person.name.split(' ')
-      const last = lastParts.join(' ') || '-'
-
-      const existingUser = usersMap.get(person.id)
-      if (existingUser) {
-        existingUser.assignedCategories.push(category.name)
-        return
-      }
-
-      usersMap.set(person.id, {
-        id: person.id,
-        firstName: first,
-        lastName: last,
-        role: roleByUserId[person.id] ?? 'Field Worker',
-        email: `${person.id}@regen.local`,
-        password: 'generated-password',
-        assignedCategories: [category.name],
-      })
-    })
-  })
-
-  return Array.from(usersMap.values()).sort(sortUsers)
+	id: string
+	name: string
 }
 
 export function useUsersPage() {
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
-  const [users, setUsers] = useState<UserRow[]>(() => buildInitialUsers())
+	const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
 
-  const categoryOptions = useMemo<CategoryOption[]>(
-    () => categories.map((category) => ({ id: category.id, name: category.name })),
-    [],
-  )
+	const { data: usersData, isLoading } = useUsers(workspaceId)
+	const createUserMutation = useCreateUser()
+	const deleteUserMutation = useDeleteUser()
 
-  function handleDeleteUser(userId: string) {
-    setUsers((prev) => prev.filter((user) => user.id !== userId))
-  }
+	const users = useMemo<UserRow[]>(() => {
+		if (!usersData) return []
+		return usersData.map((user) => ({
+			id: user.id,
+			firstName: user.firstName,
+			lastName: user.lastName,
+			email: user.email,
+			password: 'hashed-password',
+			role: user.role === 'ADMIN' ? 'Manager' : 'Field Worker', // Map backend role to frontend role
+			assignedCategories: [], // Backend doesn't support this yet
+		}))
+	}, [usersData])
 
-  function handleAddUser(data: AddUserFormValues) {
-    const assignedCategories = categoryOptions
-      .filter((category) => data.selectedCategoryIds.includes(category.id))
-      .map((category) => category.name)
+	const categoryOptions = useMemo<CategoryOption[]>(
+		() => categories.map((category) => ({ id: category.id, name: category.name })),
+		[],
+	)
 
-    const newUser: UserRow = {
-      id: `user-${Date.now()}`,
-      firstName: data.firstName.trim(),
-      lastName: data.lastName.trim(),
-      email: data.email.trim(),
-      password: data.password,
-      role: data.role,
-      assignedCategories,
-    }
+	function handleDeleteUser(userId: string) {
+		deleteUserMutation.mutate({ id: userId, workspaceId })
+	}
 
-    setUsers((prev) => [...prev, newUser].sort(sortUsers))
-  }
+	async function handleAddUser(data: AddUserFormValues) {
+		await createUserMutation.mutateAsync({
+			email: data.email,
+			firstName: data.firstName,
+			lastName: data.lastName,
+			role: data.role === 'Manager' ? 'ADMIN' : 'USER',
+			workspaceId,
+		})
+		setIsAddDialogOpen(false)
+	}
 
-  function openAddDialog() {
-    setIsAddDialogOpen(true)
-  }
+	function openAddDialog() {
+		setIsAddDialogOpen(true)
+	}
 
-  function handleAddDialogOpenChange(open: boolean) {
-    setIsAddDialogOpen(open)
-  }
+	function handleAddDialogOpenChange(open: boolean) {
+		setIsAddDialogOpen(open)
+	}
 
-  return {
-    users,
-    categoryOptions,
-    isAddDialogOpen,
-    openAddDialog,
-    handleAddDialogOpenChange,
-    handleDeleteUser,
-    handleAddUser,
-  }
+	return {
+		users,
+		categoryOptions,
+		isAddDialogOpen,
+		openAddDialog,
+		handleAddDialogOpenChange,
+		handleDeleteUser,
+		handleAddUser,
+		isLoading,
+	}
 }
