@@ -4,7 +4,7 @@ import type { UserRow } from '@/pages/UsersPage'
 import { getCoreRowModel, useReactTable, type ColumnDef } from '@tanstack/react-table'
 import { Plus, Users } from 'lucide-react'
 import { useMemo } from 'react'
-import { UserActionsCell } from './UserActionsCell.tsx'
+import { UserActionsCell } from './UserActionsCell'
 
 type UsersTableSectionProps = {
 	users: UserRow[]

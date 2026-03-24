@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { customInstance } from '@/lib/axios'
 import { QUERY_KEY } from '@/common/constants/query-key.constant'
-import { UserRole } from './user.query'
+import { UserRole } from './user.queries'
 
 export type CreateUserRequest = {
   email: string

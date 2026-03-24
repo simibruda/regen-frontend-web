@@ -1,8 +1,9 @@
 import { useCreateUser, useDeleteUser } from '@/common/api/user/user.mutations'
-import { useUsers } from '@/common/api/user/user.query'
+import { userQueryOptions } from '@/common/api/user/user.queries'
 import { categories } from '@/common/mocks/categories'
 import type { AddUserFormValues } from '@/features/workspace/components/user-manager/add-user-modal/useAddUserModal'
 import type { UserRow } from '@/pages/UsersPage'
+import { useQuery } from '@tanstack/react-query'
 import { useMemo, useState } from 'react'
 
 const workspaceId = 'workspace-1' // Hardcoded for now
@@ -15,7 +16,7 @@ type CategoryOption = {
 export function useUsersPage() {
 	const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
 
-	const { data: usersData, isLoading } = useUsers(workspaceId)
+	const { data: usersData, isLoading } = useQuery(userQueryOptions.getWorkspaceUsers(workspaceId))
 	const createUserMutation = useCreateUser()
 	const deleteUserMutation = useDeleteUser()
 

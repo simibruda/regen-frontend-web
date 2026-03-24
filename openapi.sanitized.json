@@ -2453,6 +2453,7 @@
             "minLength": 1
           },
           "routeItems": {
+            "minItems": 2,
             "type": "array",
             "items": {
               "type": "object",
@@ -2478,7 +2479,8 @@
           "startKm",
           "date",
           "carId",
-          "categoryId"
+          "categoryId",
+          "routeItems"
         ]
       },
       "GetMyRoutesRequest": {

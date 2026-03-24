@@ -389,7 +389,8 @@ export interface CreateRouteRequest {
   carId: string
   /** @minLength 1 */
   categoryId: string
-  routeItems?: CreateRouteRequestRouteItemsItem[]
+  /** @minItems 2 */
+  routeItems: CreateRouteRequestRouteItemsItem[]
 }
 
 export type GetMyRoutesRequestSortOrder =

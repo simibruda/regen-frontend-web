@@ -5,6 +5,8 @@ import { queryOptions } from '@tanstack/react-query'
 
 const USERS_PAGE_LIMIT = 20
 
+export type UserRole = 'ADMIN' | 'USER'
+
 export const userQueryOptions = {
   getWorkspaceUsers: (workspaceId: string, search?: string) =>
     queryOptions({
