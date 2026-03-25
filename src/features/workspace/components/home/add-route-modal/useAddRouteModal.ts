@@ -37,6 +37,7 @@ const defaultValues = {
   stops: [
     { order: 1, name: '' },
     { order: 2, name: '' },
+    { order: 3, name: '' },
   ],
 }
 const CATEGORY_SEARCH_DEBOUNCE_MS = 500
