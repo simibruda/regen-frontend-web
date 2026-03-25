@@ -389,7 +389,8 @@ export interface CreateRouteRequest {
   carId: string
   /** @minLength 1 */
   categoryId: string
-  routeItems?: CreateRouteRequestRouteItemsItem[]
+  /** @minItems 2 */
+  routeItems: CreateRouteRequestRouteItemsItem[]
 }
 
 export type GetMyRoutesRequestSortOrder =
@@ -691,6 +692,13 @@ export interface ReceiptWorkspaceResponse {
   updatedAt: string
 }
 
+export interface ExtractReceiptFromPdfItem {
+  amount: number
+  shopper: string
+  /** @pattern ^\d{4}-\d{2}-\d{2}$ */
+  date: string
+}
+
 export interface WorkspacePublicResponse {
   id: string
   name: string
@@ -893,6 +901,18 @@ export type ReceiptControllerGetWorkspaceReceiptsHeaders = {
    * Workspace ID associated with the authenticated user
    */
   'workspace-id': string
+}
+
+export type ReceiptControllerExtractReceiptFromPdfHeaders = {
+  /**
+   * Workspace ID associated with the authenticated user
+   */
+  'workspace-id': string
+}
+
+export type ReceiptControllerExtractReceiptFromPdfBody = {
+  /** PDF statement file */
+  file: Blob
 }
 
 export type ReceiptControllerGetReceiptBlobHeaders = {

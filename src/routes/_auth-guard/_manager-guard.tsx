@@ -1,10 +1,10 @@
 import { CurrentUserResponseRole } from '@/common/api/_base/api-types.schemas'
 import { authQueryOptions } from '@/common/api/auth/auth.queries'
-import { queryClient } from '@/lib/tanstack-query'
 import { Outlet, createFileRoute, redirect } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_auth-guard/_manager-guard')({
-  beforeLoad: async () => {
+  beforeLoad: async ({ context }) => {
+    const { queryClient } = context
     try {
       const user = await queryClient.fetchQuery(authQueryOptions.getCurrentUser)
 
@@ -16,7 +16,7 @@ export const Route = createFileRoute('/_auth-guard/_manager-guard')({
         return redirect({ to: '/' })
       }
 
-      return { user }
+      return;
     } catch {
       return redirect({ to: '/login' })
     }

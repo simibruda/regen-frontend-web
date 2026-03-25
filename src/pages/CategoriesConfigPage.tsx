@@ -81,7 +81,9 @@ export function CategoriesConfigPage() {
               Click a category row to manage assigned users.
             </p>
           </div>
-          <CreateCategoryModal workspaceId={workspaceId} />
+          <div className="flex flex-wrap items-center gap-2">
+            <CreateCategoryModal workspaceId={workspaceId} />
+          </div>
         </div>
 
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">

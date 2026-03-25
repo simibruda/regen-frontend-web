@@ -3,6 +3,7 @@ import type { GetMyRoutesResponse } from '@/common/api/_base/api-types.schemas'
 import { Loader } from '@/common/components/_base/loader'
 import { AddReceiptModal } from '@/features/workspace/components/home/add-receipt-modal'
 import { AddRouteModal } from '@/features/workspace/components/home/add-route-modal'
+import { BankStatementModal } from '@/features/workspace/components/categories-config/bank-statement-modal'
 import { OpenRouteRow } from '@/features/workspace/components/home/open-route-row'
 import { useQuery } from '@tanstack/react-query'
 import { Route } from 'lucide-react'
@@ -49,6 +50,7 @@ export function HomeRoutesSection({ workspaceId }: HomeRoutesSectionProps) {
           <div className="hidden items-center gap-2 md:flex">
             <AddRouteModal />
             <AddReceiptModal />
+            <BankStatementModal workspaceId={workspaceId} />
           </div>
         </div>
         {myUnfinished.length === 0 ? (

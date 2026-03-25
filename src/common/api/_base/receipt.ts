@@ -6,10 +6,13 @@
  * OpenAPI spec version: 1.0
  */
 import type {
+  ExtractReceiptFromPdfItem,
   GetReceiptsByWorkspaceRequest,
   MutationResponse,
   ReceiptControllerAddRecipeBody,
   ReceiptControllerAddRecipeHeaders,
+  ReceiptControllerExtractReceiptFromPdfBody,
+  ReceiptControllerExtractReceiptFromPdfHeaders,
   ReceiptControllerGetReceiptBlobHeaders,
   ReceiptControllerGetWorkspaceReceiptsHeaders,
   ReceiptWorkspaceResponse,
@@ -60,6 +63,23 @@ export const receiptControllerGetWorkspaceReceipts = (
   )
 }
 /**
+ * Upload a bank-statement PDF and extract debit transactions as amount, shopper, and date.
+ * @summary Extract receipt transactions from PDF
+ */
+export const receiptControllerExtractReceiptFromPdf = (
+  receiptControllerExtractReceiptFromPdfBody: ReceiptControllerExtractReceiptFromPdfBody,
+  headers: ReceiptControllerExtractReceiptFromPdfHeaders,
+  options?: SecondParameter<typeof customInstance<ExtractReceiptFromPdfItem[]>>
+) => {
+  const formData = new FormData()
+  formData.append(`file`, receiptControllerExtractReceiptFromPdfBody.file)
+
+  return customInstance<ExtractReceiptFromPdfItem[]>(
+    { url: `/workspace/receipt/extract-from-pdf`, method: 'POST', headers, data: formData },
+    options
+  )
+}
+/**
  * Retrieve the receipt file binary for a specific receipt in the authenticated workspace.
  * @summary Get receipt blob
  */
@@ -78,6 +98,9 @@ export type ReceiptControllerAddRecipeResult = NonNullable<
 >
 export type ReceiptControllerGetWorkspaceReceiptsResult = NonNullable<
   Awaited<ReturnType<typeof receiptControllerGetWorkspaceReceipts>>
+>
+export type ReceiptControllerExtractReceiptFromPdfResult = NonNullable<
+  Awaited<ReturnType<typeof receiptControllerExtractReceiptFromPdf>>
 >
 export type ReceiptControllerGetReceiptBlobResult = NonNullable<
   Awaited<ReturnType<typeof receiptControllerGetReceiptBlob>>
