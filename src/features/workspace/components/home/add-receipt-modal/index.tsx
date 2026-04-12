@@ -10,6 +10,10 @@ import {
 import { Dropzone } from '@/common/components/_base/dropzone'
 import { InputField } from '@/common/components/_base/input-field'
 import { SearchableSelectField } from '@/common/components/_base/searchable-select-field'
+import {
+  homeWorkspaceAccentIconTriggerCn,
+  homeWorkspaceAccentTriggerCn,
+} from '@/features/workspace/components/home/home-workspace-action-triggers'
 import { Receipt } from 'lucide-react'
 import { Controller } from 'react-hook-form'
 import { useAddReceiptModal } from './useAddReceiptModal'
@@ -40,17 +44,24 @@ export function AddReceiptModal({ mobile = false }: AddReceiptModalProps) {
     <>
       {mobile ? (
         <Button
-          size="lg"
+          type="button"
           variant="default"
-          className="rounded-full shadow-lg"
+          size="icon"
+          className={homeWorkspaceAccentIconTriggerCn(true)}
+          aria-label="Add receipt"
           onClick={() => setOpen(true)}
           disabled={!workspaceId}
         >
           <Receipt className="h-5 w-5" />
-          Add Receipt
         </Button>
       ) : (
-        <Button variant="default" onClick={() => setOpen(true)} disabled={!workspaceId}>
+        <Button
+          type="button"
+          variant="default"
+          className={homeWorkspaceAccentTriggerCn(false)}
+          onClick={() => setOpen(true)}
+          disabled={!workspaceId}
+        >
           <Receipt className="h-4 w-4" />
           Add Receipt
         </Button>

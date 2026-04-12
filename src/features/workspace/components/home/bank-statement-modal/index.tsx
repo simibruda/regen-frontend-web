@@ -10,6 +10,10 @@ import {
 import { Dropzone } from '@/common/components/_base/dropzone'
 import { Input } from '@/common/components/_base/input'
 import { SearchableSelectField } from '@/common/components/_base/searchable-select-field'
+import {
+  homeWorkspaceOutlineIconTriggerCn,
+  homeWorkspaceOutlineTriggerCn,
+} from '@/features/workspace/components/home/home-workspace-action-triggers'
 import { FileText, Plus, Receipt, Trash2 } from 'lucide-react'
 import dayjs from 'dayjs'
 import { useBankStatementModal } from './useBankStatementModal'
@@ -23,9 +27,10 @@ function dateToInputValue(raw: string): string {
 
 type BankStatementModalProps = {
   workspaceId: string
+  mobile?: boolean
 }
 
-export function BankStatementModal({ workspaceId }: BankStatementModalProps) {
+export function BankStatementModal({ workspaceId, mobile = false }: BankStatementModalProps) {
   const {
     open,
     setOpen,
@@ -47,10 +52,30 @@ export function BankStatementModal({ workspaceId }: BankStatementModalProps) {
 
   return (
     <>
-      <Button type="button" variant="outline" onClick={() => setOpen(true)}>
-        <FileText className="h-4 w-4" />
-        Bank statement
-      </Button>
+      {mobile ? (
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          className={homeWorkspaceOutlineIconTriggerCn(true)}
+          aria-label="Bank statement"
+          onClick={() => setOpen(true)}
+          disabled={!workspaceId}
+        >
+          <FileText className="h-5 w-5 text-primary" />
+        </Button>
+      ) : (
+        <Button
+          type="button"
+          variant="outline"
+          className={homeWorkspaceOutlineTriggerCn(false)}
+          onClick={() => setOpen(true)}
+          disabled={!workspaceId}
+        >
+          <FileText className="h-4 w-4 text-primary" />
+          Bank statement
+        </Button>
+      )}
 
       <Dialog open={open} onOpenChange={handleOpenChange}>
         <DialogContent className="md:max-w-4xl" showCloseButton={!isParsing && !isSavingReceipts}>

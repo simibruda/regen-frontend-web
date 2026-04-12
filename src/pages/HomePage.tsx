@@ -56,6 +56,7 @@ export function HomePage() {
     <main className="min-h-full bg-background p-4 pb-36 md:p-5 md:pb-5">
       <HomeRoutesSection workspaceId={workspaceId} />
       <CategorySection
+        workspaceId={workspaceId}
         categories={categories}
         hasNextPage={Boolean(hasNextPage)}
         isFetchingNextPage={isFetchingNextPage}

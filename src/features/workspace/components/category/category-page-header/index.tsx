@@ -1,4 +1,5 @@
 import { Button } from '@/common/components/_base/button'
+import { homeWorkspaceOutlineTriggerCn } from '@/features/workspace/components/home/home-workspace-action-triggers'
 import { Link } from '@tanstack/react-router'
 import { ArrowLeft, CalendarDays } from 'lucide-react'
 import { useRef } from 'react'
@@ -38,11 +39,7 @@ export function CategoryPageHeader({
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:gap-6">
             <Link to="/" className="shrink-0">
-              <Button
-                variant="outline"
-                size="sm"
-                className="rounded-full border-border/80 bg-background/80 text-foreground shadow-sm backdrop-blur-sm hover:bg-secondary"
-              >
+              <Button type="button" variant="outline" className={homeWorkspaceOutlineTriggerCn(false)}>
                 <ArrowLeft className="h-4 w-4 text-primary" />
                 Back
               </Button>

@@ -3,9 +3,11 @@ import { LayoutGrid } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 import { AddReceiptModal } from '../add-receipt-modal'
 import { AddRouteModal } from '../add-route-modal'
+import { BankStatementModal } from '../bank-statement-modal'
 import { CategoryCard } from '../category-card'
 
 type CategorySectionProps = {
+  workspaceId: string
   categories: Category[]
   hasNextPage: boolean
   isFetchingNextPage: boolean
@@ -13,6 +15,7 @@ type CategorySectionProps = {
 }
 
 export function CategorySection({
+  workspaceId,
   categories,
   hasNextPage,
   isFetchingNextPage,
@@ -77,9 +80,10 @@ export function CategorySection({
       </div>
 
       {/* Mobile FABs — sit above the bottom nav (bottom-4 + ~56px nav height) */}
-      <div className="fixed bottom-24 left-1/2 z-40 flex -translate-x-1/2 flex-row gap-2 md:hidden">
+      <div className="fixed bottom-24 left-1/2 z-40 flex max-w-[min(100vw-1rem,28rem)] -translate-x-1/2 flex-row flex-wrap justify-center gap-2 md:hidden">
         <AddRouteModal mobile />
         <AddReceiptModal mobile />
+        <BankStatementModal mobile workspaceId={workspaceId} />
       </div>
     </>
   )

@@ -9,6 +9,10 @@ import {
 } from '@/common/components/_base/dialog'
 import { InputField } from '@/common/components/_base/input-field'
 import { SearchableSelectField } from '@/common/components/_base/searchable-select-field'
+import {
+  homeWorkspaceOutlineIconTriggerCn,
+  homeWorkspaceOutlineTriggerCn,
+} from '@/features/workspace/components/home/home-workspace-action-triggers'
 import { GripVertical, MapPin, Plus, Trash2 } from 'lucide-react'
 import { Controller } from 'react-hook-form'
 import { useAddRouteModal } from './useAddRouteModal'
@@ -57,19 +61,21 @@ export function AddRouteModal({ mobile = false }: AddRouteModalProps) {
     <>
       {mobile ? (
         <Button
-          size="lg"
+          type="button"
           variant="outline"
-          className="rounded-full border-border text-foreground shadow-lg hover:bg-secondary"
+          size="icon"
+          className={homeWorkspaceOutlineIconTriggerCn(true)}
+          aria-label="Add route"
           onClick={() => setOpen(true)}
           disabled={!workspaceId}
         >
           <MapPin className="h-5 w-5 text-primary" />
-          Add Route
         </Button>
       ) : (
         <Button
+          type="button"
           variant="outline"
-          className="border-border text-foreground hover:bg-secondary"
+          className={homeWorkspaceOutlineTriggerCn(false)}
           onClick={() => setOpen(true)}
           disabled={!workspaceId}
         >
