@@ -9,6 +9,8 @@ import type {
   ExtractReceiptFromPdfItem,
   GetReceiptsByWorkspaceRequest,
   MutationResponse,
+  ReceiptControllerAddManyRecipesBody,
+  ReceiptControllerAddManyRecipesHeaders,
   ReceiptControllerAddRecipeBody,
   ReceiptControllerAddRecipeHeaders,
   ReceiptControllerExtractReceiptFromPdfBody,
@@ -40,6 +42,25 @@ export const receiptControllerAddRecipe = (
 
   return customInstance<MutationResponse>(
     { url: `/workspace/receipt`, method: 'POST', headers, data: formData },
+    options
+  )
+}
+/**
+ * Create multiple receipts from a single uploaded file and multiple items { amount, categoryId, date }.
+ * @summary Create many recipes
+ */
+export const receiptControllerAddManyRecipes = (
+  receiptControllerAddManyRecipesBody: ReceiptControllerAddManyRecipesBody,
+  headers: ReceiptControllerAddManyRecipesHeaders,
+  options?: SecondParameter<typeof customInstance<MutationResponse>>
+) => {
+  const formData = new FormData()
+  formData.append(`file`, receiptControllerAddManyRecipesBody.file)
+  formData.append(`place`, receiptControllerAddManyRecipesBody.place)
+  formData.append(`items`, receiptControllerAddManyRecipesBody.items)
+
+  return customInstance<MutationResponse>(
+    { url: `/workspace/receipt/create-many`, method: 'POST', headers, data: formData },
     options
   )
 }
@@ -95,6 +116,9 @@ export const receiptControllerGetReceiptBlob = (
 }
 export type ReceiptControllerAddRecipeResult = NonNullable<
   Awaited<ReturnType<typeof receiptControllerAddRecipe>>
+>
+export type ReceiptControllerAddManyRecipesResult = NonNullable<
+  Awaited<ReturnType<typeof receiptControllerAddManyRecipes>>
 >
 export type ReceiptControllerGetWorkspaceReceiptsResult = NonNullable<
   Awaited<ReturnType<typeof receiptControllerGetWorkspaceReceipts>>

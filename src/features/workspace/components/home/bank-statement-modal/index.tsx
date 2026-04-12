@@ -1,4 +1,3 @@
-import { apiOptions } from '@/common/api'
 import { Button } from '@/common/components/_base/button'
 import {
   Dialog,
@@ -10,25 +9,16 @@ import {
 } from '@/common/components/_base/dialog'
 import { Dropzone } from '@/common/components/_base/dropzone'
 import { Input } from '@/common/components/_base/input'
-import { useMutation } from '@tanstack/react-query'
-import { FileText, Plus, Trash2 } from 'lucide-react'
-import { useCallback, useState } from 'react'
-import { toast } from 'sonner'
+import { SearchableSelectField } from '@/common/components/_base/searchable-select-field'
+import { FileText, Plus, Receipt, Trash2 } from 'lucide-react'
+import dayjs from 'dayjs'
+import { useBankStatementModal } from './useBankStatementModal'
 
-type EditableRow = {
-  id: string
-  date: string
-  store: string
-  amount: string
-}
-
-function newRow(partial?: Partial<Pick<EditableRow, 'date' | 'store' | 'amount'>>): EditableRow {
-  return {
-    id: crypto.randomUUID(),
-    date: partial?.date ?? '',
-    store: partial?.store ?? '',
-    amount: partial?.amount ?? '',
-  }
+function dateToInputValue(raw: string): string {
+  const t = raw.trim()
+  if (!t) return ''
+  const d = dayjs(t)
+  return d.isValid() ? d.format('YYYY-MM-DD') : ''
 }
 
 type BankStatementModalProps = {
@@ -36,77 +26,24 @@ type BankStatementModalProps = {
 }
 
 export function BankStatementModal({ workspaceId }: BankStatementModalProps) {
-  const [open, setOpen] = useState(false)
-  const [file, setFile] = useState<File | undefined>()
-  const [rows, setRows] = useState<EditableRow[]>([])
-  const [isParsing, setIsParsing] = useState(false)
-  const extractReceiptFromPdfMutation = useMutation(apiOptions.mutations.extractReceiptFromPdf)
-
-  const handleOpenChange = (next: boolean) => {
-    if (!next) {
-      setFile(undefined)
-      setRows([])
-    }
-    setOpen(next)
-  }
-
-  const importPdf = useCallback(async (pdfFile: File) => {
-    if (!workspaceId) {
-      toast.error('Workspace not found')
-      return
-    }
-
-    setIsParsing(true)
-    try {
-      const parsed = await extractReceiptFromPdfMutation.mutateAsync({
-        workspaceId,
-        request: { file: pdfFile },
-      })
-      if (parsed.length === 0) {
-        toast.message('No transactions found', {
-          description:
-            'No date + amount pairs were detected. Scanned PDFs have no text—use a searchable PDF or add rows manually.',
-        })
-        setRows([])
-        return
-      }
-      setRows(
-        parsed.map((t) =>
-          newRow({
-            date: t.date,
-            store: t.shopper,
-            amount: String(t.amount),
-          }),
-        ),
-      )
-      toast.success(`Imported ${parsed.length} transaction(s)`)
-    } catch (e) {
-      console.error(e)
-      toast.error('Could not read this PDF')
-      setRows([])
-    } finally {
-      setIsParsing(false)
-    }
-  }, [extractReceiptFromPdfMutation, workspaceId])
-
-  const handleFileChange = (next: File | undefined) => {
-    setFile(next)
-    if (next) {
-      void importPdf(next)
-    } else {
-      setRows([])
-    }
-  }
-
-  const updateRow = (id: string, field: keyof Pick<EditableRow, 'date' | 'store' | 'amount'>, value: string) => {
-    setRows((prev) =>
-      prev.map((row) => (row.id === id ? { ...row, [field]: value } : row)),
-    )
-  }
-
-  const removeRow = (id: string) => {
-    setRows((prev) => prev.filter((row) => row.id !== id))
-  }
+  const {
+    open,
+    setOpen,
+    handleOpenChange,
+    file,
+    handleFileChange,
+    rows,
+    isParsing,
+    categorySearchValue,
+    setCategorySearchValue,
+    categoryOptions,
+    updateRow,
+    removeRow,
+    appendRow,
+    startManualRows,
+    handleAddReceipts,
+    isSavingReceipts,
+  } = useBankStatementModal(workspaceId)
 
   return (
     <>
@@ -116,14 +53,15 @@ export function BankStatementModal({ workspaceId }: BankStatementModalProps) {
       </Button>
 
       <Dialog open={open} onOpenChange={handleOpenChange}>
-        <DialogContent className="md:max-w-4xl" showCloseButton={!isParsing}>
+        <DialogContent className="md:max-w-4xl" showCloseButton={!isParsing && !isSavingReceipts}>
           <DialogHeader className="rounded-t-2xl bg-linear-to-r from-primary to-primary-2 p-4 pb-3">
             <DialogTitle className="flex items-center gap-2 text-white">
               <FileText className="h-5 w-5" />
               Bank statement
             </DialogTitle>
             <DialogDescription className="text-white/75">
-              Upload a PDF to import transactions, then edit or remove rows as needed.
+              Upload a PDF to import transactions. Place is saved on each receipt; pick a category
+              per row, then add receipts.
             </DialogDescription>
           </DialogHeader>
 
@@ -137,9 +75,7 @@ export function BankStatementModal({ workspaceId }: BankStatementModalProps) {
               label="Statement PDF"
             />
 
-            {isParsing && (
-              <p className="text-sm text-muted-foreground">Reading PDF…</p>
-            )}
+            {isParsing && <p className="text-sm text-muted-foreground">Reading PDF…</p>}
 
             {rows.length > 0 && (
               <div className="space-y-2">
@@ -147,25 +83,28 @@ export function BankStatementModal({ workspaceId }: BankStatementModalProps) {
                   <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                     Transactions
                   </p>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="gap-1"
-                    onClick={() => setRows((prev) => [...prev, newRow()])}
-                  >
+                  <Button type="button" variant="outline" size="sm" className="gap-1" onClick={appendRow}>
                     <Plus className="h-3.5 w-3.5" />
                     Add row
                   </Button>
                 </div>
 
                 <div className="overflow-x-auto rounded-xl border border-border">
-                  <table className="w-full min-w-[520px] text-left text-sm">
-                    <thead className="border-b border-border bg-muted/50">
+                  <table className="w-full min-w-[720px] text-left text-sm">
+                    <thead className="sticky top-0 z-10 border-b border-border bg-muted/95 backdrop-blur-sm">
                       <tr>
-                        <th className="px-3 py-2 font-medium">Date</th>
-                        <th className="px-3 py-2 font-medium">Store</th>
-                        <th className="px-3 py-2 font-medium">Amount</th>
+                        <th className="px-3 py-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                          Date
+                        </th>
+                        <th className="px-3 py-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                          Place
+                        </th>
+                        <th className="px-3 py-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                          Amount
+                        </th>
+                        <th className="min-w-[160px] px-3 py-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                          Category
+                        </th>
                         <th className="w-12 px-2 py-2" />
                       </tr>
                     </thead>
@@ -174,28 +113,44 @@ export function BankStatementModal({ workspaceId }: BankStatementModalProps) {
                         <tr key={row.id} className="border-b border-border last:border-0">
                           <td className="px-2 py-1 align-middle">
                             <Input
-                              value={row.date}
+                              type="date"
+                              value={dateToInputValue(row.date)}
                               onChange={(e) => updateRow(row.id, 'date', e.target.value)}
-                              placeholder="DD/MM/YYYY"
                               className="h-9 rounded-md border border-border bg-background px-2"
                             />
                           </td>
                           <td className="px-2 py-1 align-middle">
                             <Input
-                              value={row.store}
-                              onChange={(e) => updateRow(row.id, 'store', e.target.value)}
-                              placeholder="Merchant"
+                              value={row.name}
+                              onChange={(e) => updateRow(row.id, 'name', e.target.value)}
+                              placeholder="Place / merchant"
                               className="h-9 rounded-md border border-border bg-background px-2"
                             />
                           </td>
                           <td className="px-2 py-1 align-middle">
                             <Input
-                              type="text"
-                              inputMode="decimal"
+                              type="number"
+                              min={0}
+                              step={0.01}
                               value={row.amount}
                               onChange={(e) => updateRow(row.id, 'amount', e.target.value)}
                               placeholder="0.00"
                               className="h-9 rounded-md border border-border bg-background px-2"
+                            />
+                          </td>
+                          <td className="px-2 py-1 align-middle">
+                            <SearchableSelectField
+                              id={`statement-cat-${row.id}`}
+                              label="Category"
+                              hideLabel
+                              placeholder="Select category"
+                              searchPlaceholder="Search categories..."
+                              noOptionsText="No categories found."
+                              options={categoryOptions}
+                              value={row.categoryId}
+                              onValueChange={(v) => updateRow(row.id, 'categoryId', v)}
+                              searchValue={categorySearchValue}
+                              onSearchValueChange={setCategorySearchValue}
                             />
                           </td>
                           <td className="px-1 py-1 align-middle text-center">
@@ -223,13 +178,7 @@ export function BankStatementModal({ workspaceId }: BankStatementModalProps) {
                 <p className="text-sm text-muted-foreground">
                   No rows yet — try another PDF or add rows manually.
                 </p>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="shrink-0 gap-1"
-                  onClick={() => setRows([newRow()])}
-                >
+                <Button type="button" variant="outline" size="sm" className="shrink-0 gap-1" onClick={startManualRows}>
                   <Plus className="h-4 w-4" />
                   Add row
                 </Button>
@@ -237,21 +186,28 @@ export function BankStatementModal({ workspaceId }: BankStatementModalProps) {
             )}
 
             {!isParsing && !file && (
-              <Button
-                type="button"
-                variant="outline"
-                className="self-start"
-                onClick={() => setRows([newRow()])}
-              >
+              <Button type="button" variant="outline" className="self-start" onClick={startManualRows}>
                 <Plus className="h-4 w-4" />
                 Add transaction manually
               </Button>
             )}
           </div>
 
-          <DialogFooter className="border-t border-border/50 px-4">
+          <DialogFooter className="flex flex-col gap-2 border-t border-border/50 px-4 sm:flex-row sm:justify-end">
             <Button type="button" variant="outline" onClick={() => handleOpenChange(false)}>
               Close
+            </Button>
+            <Button
+              type="button"
+              variant="default"
+              className="gap-2"
+              disabled={
+                !file || rows.length === 0 || isParsing || isSavingReceipts || !workspaceId
+              }
+              onClick={() => void handleAddReceipts()}
+            >
+              <Receipt className="h-4 w-4" />
+              {isSavingReceipts ? 'Saving…' : 'Add receipts'}
             </Button>
           </DialogFooter>
         </DialogContent>

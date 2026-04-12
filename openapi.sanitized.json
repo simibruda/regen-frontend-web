@@ -1293,6 +1293,83 @@
         ]
       }
     },
+    "/workspace/receipt/create-many": {
+      "post": {
+        "description": "Create multiple receipts from a single uploaded file and multiple items { amount, categoryId, date }.",
+        "operationId": "ReceiptController_addManyRecipes",
+        "parameters": [
+          {
+            "name": "workspace-id",
+            "in": "header",
+            "description": "Workspace ID associated with the authenticated user",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "file",
+                  "place",
+                  "items"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Receipt file to upload (shared for all items)"
+                  },
+                  "place": {
+                    "type": "string",
+                    "example": "Supermarket"
+                  },
+                  "items": {
+                    "type": "string",
+                    "description": "JSON-encoded array of items. Example: [{\"amount\": 12.34, \"categoryId\": \"...\", \"date\": \"2026-03-19T10:30:00.000Z\"}]"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Recipes created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MutationResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing or invalid workspace header or request payload"
+          },
+          "401": {
+            "description": "Missing or invalid JWT token"
+          },
+          "403": {
+            "description": "Workspace access is forbidden"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Create many recipes",
+        "tags": [
+          "Receipt"
+        ]
+      }
+    },
     "/workspace/receipt/workspace": {
       "post": {
         "description": "Retrieve receipts from the authenticated workspace using filters, sorting, and pagination from request body. Manager role required.",

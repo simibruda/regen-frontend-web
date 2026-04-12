@@ -896,6 +896,21 @@ export type ReceiptControllerAddRecipeBody = {
   categoryId: string
 }
 
+export type ReceiptControllerAddManyRecipesHeaders = {
+  /**
+   * Workspace ID associated with the authenticated user
+   */
+  'workspace-id': string
+}
+
+export type ReceiptControllerAddManyRecipesBody = {
+  /** Receipt file to upload (shared for all items) */
+  file: Blob
+  place: string
+  /** JSON-encoded array of items. Example: [{"amount": 12.34, "categoryId": "...", "date": "2026-03-19T10:30:00.000Z"}] */
+  items: string
+}
+
 export type ReceiptControllerGetWorkspaceReceiptsHeaders = {
   /**
    * Workspace ID associated with the authenticated user

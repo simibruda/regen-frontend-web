@@ -9,6 +9,8 @@ type SearchableSelectOption = {
 
 type SearchableSelectFieldProps = {
   label: string
+  /** Omit floating label (e.g. when a table column header is the label). */
+  hideLabel?: boolean
   error?: string
   placeholder?: string
   searchPlaceholder?: string
@@ -24,6 +26,7 @@ type SearchableSelectFieldProps = {
 
 function SearchableSelectField({
   label,
+  hideLabel = false,
   error,
   placeholder,
   searchPlaceholder = 'Search...',
@@ -89,9 +92,10 @@ function SearchableSelectField({
         >
           <SelectTrigger
             id={id}
+            aria-label={hideLabel ? label : undefined}
             aria-invalid={!!error}
             className={cn(
-              'peer pt-5',
+              hideLabel ? 'h-9 py-1' : 'peer pt-5',
               error && 'border-destructive focus-visible:border-destructive'
             )}
           >
@@ -123,18 +127,22 @@ function SearchableSelectField({
             </SelectList>
           </SelectPopup>
         </Select>
-        <label
-          htmlFor={id}
-          className={cn(
-            'pointer-events-none absolute left-2.5 transition-all',
-            hasValue || isOpen ? 'top-1 text-xs' : 'top-3 text-sm',
-            error ? 'text-destructive' : 'text-black/50'
-          )}
-        >
-          {label}
-        </label>
+        {!hideLabel && (
+          <label
+            htmlFor={id}
+            className={cn(
+              'pointer-events-none absolute left-2.5 transition-all',
+              hasValue || isOpen ? 'top-1 text-xs' : 'top-3 text-sm',
+              error ? 'text-destructive' : 'text-black/50'
+            )}
+          >
+            {label}
+          </label>
+        )}
       </div>
-      <div className="h-4">{error && <p className="text-xs text-destructive">{error}</p>}</div>
+      <div className={cn(hideLabel ? 'min-h-0' : 'h-4')}>
+        {error && <p className="text-xs text-destructive">{error}</p>}
+      </div>
     </div>
   )
 }

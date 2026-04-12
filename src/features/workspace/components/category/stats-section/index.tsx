@@ -82,30 +82,34 @@ export function StatsSection({
                 </div>
               </div>
 
-              <div className="space-y-2">
-                {pieChartData.slices.map((item) => (
-                  <div
-                    key={item.name}
-                    className="flex items-center justify-between gap-4 rounded-xl border border-transparent bg-muted/20 px-4 py-3 transition-colors hover:border-border hover:bg-muted/40"
-                  >
-                    <span className="flex min-w-0 items-center gap-3 font-medium text-foreground">
-                      <span
-                        className="h-3 w-3 shrink-0 rounded-full shadow-sm ring-2 ring-background"
-                        style={{ backgroundColor: item.color }}
-                      />
-                      <span className="truncate">{item.name}</span>
-                    </span>
-                    <span className="shrink-0 text-right">
-                      <span className="block text-sm font-semibold tabular-nums text-foreground">
-                        {formatCurrency(item.totalAmount)}
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        {item.percentage.toFixed(1)}%
-                      </span>
-                    </span>
+              <div className="flex min-h-0 min-w-0 flex-col gap-3">
+                <div className="max-h-72 overflow-y-auto overscroll-y-contain pr-1 [scrollbar-gutter:stable]">
+                  <div className="space-y-2">
+                    {pieChartData.slices.map((item) => (
+                      <div
+                        key={item.name}
+                        className="flex items-center justify-between gap-4 rounded-xl border border-transparent bg-muted/20 px-4 py-3 transition-colors hover:border-border hover:bg-muted/40"
+                      >
+                        <span className="flex min-w-0 items-center gap-3 font-medium text-foreground">
+                          <span
+                            className="h-3 w-3 shrink-0 rounded-full shadow-sm ring-2 ring-background"
+                            style={{ backgroundColor: item.color }}
+                          />
+                          <span className="truncate">{item.name}</span>
+                        </span>
+                        <span className="shrink-0 text-right">
+                          <span className="block text-sm font-semibold tabular-nums text-foreground">
+                            {formatCurrency(item.totalAmount)}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            {item.percentage.toFixed(1)}%
+                          </span>
+                        </span>
+                      </div>
+                    ))}
                   </div>
-                ))}
-                <div className="mt-3 flex items-center justify-between rounded-xl border border-border/80 bg-primary/5 px-4 py-3">
+                </div>
+                <div className="flex shrink-0 items-center justify-between rounded-xl border border-border/80 bg-primary/5 px-4 py-3">
                   <span className="font-semibold text-foreground">Total</span>
                   <span className="text-base font-bold tabular-nums text-foreground">
                     {formatCurrency(pieChartData.totalAmount)}
