@@ -1,6 +1,7 @@
 import {
   receiptControllerAddManyRecipes,
   receiptControllerAddRecipe,
+  receiptControllerDeleteReceipt,
   receiptControllerExtractReceiptFromPdf,
 } from '@/common/api/_base/receipt'
 import type {
@@ -24,6 +25,11 @@ type CreateManyReceiptsMutationInput = {
 type ExtractReceiptFromPdfMutationInput = {
   workspaceId: string
   request: ReceiptControllerExtractReceiptFromPdfBody
+}
+
+type DeleteReceiptMutationInput = {
+  workspaceId: string
+  receiptId: string
 }
 
 export const receiptMutationOptions = {
@@ -59,6 +65,20 @@ export const receiptMutationOptions = {
     mutationFn: async ({ workspaceId, request }: ExtractReceiptFromPdfMutationInput) => {
       const response = await receiptControllerExtractReceiptFromPdf(
         request,
+        { 'workspace-id': workspaceId },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem(LOCAL_STORAGE_KEYS.TOKEN)}`,
+          },
+        }
+      )
+      return response
+    },
+  }),
+  deleteReceipt: mutationOptions({
+    mutationFn: async ({ workspaceId, receiptId }: DeleteReceiptMutationInput) => {
+      const response = await receiptControllerDeleteReceipt(
+        receiptId,
         { 'workspace-id': workspaceId },
         {
           headers: {

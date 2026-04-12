@@ -1499,6 +1499,65 @@
         ]
       }
     },
+    "/workspace/receipt/{receiptId}": {
+      "delete": {
+        "description": "Permanently delete a receipt in the authenticated workspace. Only workspace admins may call this endpoint.",
+        "operationId": "ReceiptController_deleteReceipt",
+        "parameters": [
+          {
+            "name": "receiptId",
+            "required": true,
+            "in": "path",
+            "description": "Receipt ID to delete",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "workspace-id",
+            "in": "header",
+            "description": "Workspace ID associated with the authenticated user",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Receipt deleted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteReceiptResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing or invalid workspace header"
+          },
+          "401": {
+            "description": "Missing or invalid JWT token"
+          },
+          "403": {
+            "description": "Workspace access is forbidden or workspace admin role is required"
+          },
+          "404": {
+            "description": "Receipt was not found in the authenticated workspace"
+          }
+        },
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ],
+        "summary": "Delete receipt",
+        "tags": [
+          "Receipt"
+        ]
+      }
+    },
     "/workspace/receipt/{receiptId}/blob": {
       "get": {
         "description": "Retrieve the receipt file binary for a specific receipt in the authenticated workspace.",
@@ -3635,6 +3694,17 @@
           "amount",
           "shopper",
           "date"
+        ]
+      },
+      "DeleteReceiptResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
         ]
       },
       "WorkspacePublicResponse": {

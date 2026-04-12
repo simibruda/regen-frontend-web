@@ -699,6 +699,10 @@ export interface ExtractReceiptFromPdfItem {
   date: string
 }
 
+export interface DeleteReceiptResponse {
+  message: string
+}
+
 export interface WorkspacePublicResponse {
   id: string
   name: string
@@ -928,6 +932,13 @@ export type ReceiptControllerExtractReceiptFromPdfHeaders = {
 export type ReceiptControllerExtractReceiptFromPdfBody = {
   /** PDF statement file */
   file: Blob
+}
+
+export type ReceiptControllerDeleteReceiptHeaders = {
+  /**
+   * Workspace ID associated with the authenticated user
+   */
+  'workspace-id': string
 }
 
 export type ReceiptControllerGetReceiptBlobHeaders = {

@@ -6,6 +6,7 @@
  * OpenAPI spec version: 1.0
  */
 import type {
+  DeleteReceiptResponse,
   ExtractReceiptFromPdfItem,
   GetReceiptsByWorkspaceRequest,
   MutationResponse,
@@ -13,6 +14,7 @@ import type {
   ReceiptControllerAddManyRecipesHeaders,
   ReceiptControllerAddRecipeBody,
   ReceiptControllerAddRecipeHeaders,
+  ReceiptControllerDeleteReceiptHeaders,
   ReceiptControllerExtractReceiptFromPdfBody,
   ReceiptControllerExtractReceiptFromPdfHeaders,
   ReceiptControllerGetReceiptBlobHeaders,
@@ -101,6 +103,20 @@ export const receiptControllerExtractReceiptFromPdf = (
   )
 }
 /**
+ * Permanently delete a receipt in the authenticated workspace. Only workspace admins may call this endpoint.
+ * @summary Delete receipt
+ */
+export const receiptControllerDeleteReceipt = (
+  receiptId: string,
+  headers: ReceiptControllerDeleteReceiptHeaders,
+  options?: SecondParameter<typeof customInstance<DeleteReceiptResponse>>
+) => {
+  return customInstance<DeleteReceiptResponse>(
+    { url: `/workspace/receipt/${receiptId}`, method: 'DELETE', headers },
+    options
+  )
+}
+/**
  * Retrieve the receipt file binary for a specific receipt in the authenticated workspace.
  * @summary Get receipt blob
  */
@@ -125,6 +141,9 @@ export type ReceiptControllerGetWorkspaceReceiptsResult = NonNullable<
 >
 export type ReceiptControllerExtractReceiptFromPdfResult = NonNullable<
   Awaited<ReturnType<typeof receiptControllerExtractReceiptFromPdf>>
+>
+export type ReceiptControllerDeleteReceiptResult = NonNullable<
+  Awaited<ReturnType<typeof receiptControllerDeleteReceipt>>
 >
 export type ReceiptControllerGetReceiptBlobResult = NonNullable<
   Awaited<ReturnType<typeof receiptControllerGetReceiptBlob>>

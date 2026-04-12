@@ -1,7 +1,11 @@
 import { apiOptions } from '@/common/api'
+import {
+  CurrentUserResponseRole,
+  type ReceiptWorkspaceResponse,
+} from '@/common/api/_base/api-types.schemas'
 import { RECEIPTS_PAGE_LIMIT } from '@/common/api/receipt/receipt.queries'
-import type { ReceiptWorkspaceResponse } from '@/common/api/_base/api-types.schemas'
 import { Loader } from '@/common/components/_base/loader'
+import { ReceiptDeleteButton } from '@/features/workspace/components/category/receipt-delete-button'
 import { ReceiptDownloadButton } from '@/features/workspace/components/category/receipt-download-button'
 import {
   Pagination,
@@ -35,6 +39,7 @@ export function ReceiptsTableSection({
     ...apiOptions.queries.getCurrentUser,
   })
   const workspaceId = currentUser?.workspaceId ?? ''
+  const canDeleteReceipts = currentUser?.role === CurrentUserResponseRole.ADMIN
   const enabled = Boolean(workspaceId && categoryId)
 
   const [currentPage, setCurrentPage] = useState(1)
@@ -65,17 +70,22 @@ export function ReceiptsTableSection({
       },
       {
         header: '',
-        id: 'download',
+        id: 'actions',
         cell: ({ row }) => (
-          <ReceiptDownloadButton
-            workspaceId={workspaceId}
-            receipt={row.original}
-            categoryName={categoryName}
-          />
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            <ReceiptDownloadButton
+              workspaceId={workspaceId}
+              receipt={row.original}
+              categoryName={categoryName}
+            />
+            {canDeleteReceipts ? (
+              <ReceiptDeleteButton workspaceId={workspaceId} receipt={row.original} />
+            ) : null}
+          </div>
         ),
       },
     ],
-    [categoryName, workspaceId],
+    [canDeleteReceipts, categoryName, workspaceId],
   )
 
   const receiptTable = useReactTable({
