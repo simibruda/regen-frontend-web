@@ -4,7 +4,7 @@ import {
 } from '@/common/api/_base/car'
 import { LOCAL_STORAGE_KEYS } from '@/common/constants/local-storage.constants'
 import { QUERY_KEY } from '@/common/constants/query-key.constant'
-import { queryOptions } from '@tanstack/react-query'
+import { queryOptions, useQuery } from '@tanstack/react-query'
 
 const CARS_PAGE_LIMIT = 20
 
@@ -49,5 +49,19 @@ export const carQueryOptions = {
         )
         return response
       },
+      enabled: Boolean(workspaceId) && Boolean(categoryId),
     }),
+}
+
+export const useWorkspaceCars = (workspaceId: string, searchValue = '') => {
+  return useQuery(carQueryOptions.getWorkspaceCars(workspaceId, searchValue))
+}
+
+export const useWorkspaceCarsTotalKm = (
+  workspaceId: string,
+  categoryId: string,
+  startDate: string,
+  endDate: string
+) => {
+  return useQuery(carQueryOptions.getWorkspaceCarsTotalKm(workspaceId, categoryId, startDate, endDate))
 }

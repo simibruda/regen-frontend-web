@@ -14,7 +14,7 @@ export const Route = createFileRoute('/_auth-guard')({
 
       return { user }
     } catch {
-      return redirect({ to: '/login' })
+      throw redirect({ to: '/login' })
     }
   },
   component: Layout,
