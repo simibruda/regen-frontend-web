@@ -1,7 +1,7 @@
 import { authMutationOptions } from './auth/auth.mutations'
 import { authQueryOptions } from './auth/auth.queries'
 import { carMutationOptions } from './car/car.mutations'
-import { carQueryOptions } from './car/car.queries'
+import { carQueryOptions } from './car/car.query'
 import { categoryMutationOptions } from './category/category.mutations'
 import { categoryQueryOptions } from './category/category.queries'
 import { receiptMutationOptions } from './receipt/receipt.mutations'
